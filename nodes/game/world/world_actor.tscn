@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b18gcgc0mishy"]
+
+[ext_resource type="Script" uid="uid://cr4nu2k13vqdw" path="res://scripts/nodes/game/world/worldactor.gd" id="1_vjdow"]
+
+[node name="WorldActor" type="Node2D" unique_id=849325145]
+script = ExtResource("1_vjdow")

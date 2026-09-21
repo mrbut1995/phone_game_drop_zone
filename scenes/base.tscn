@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bxp5t8ix6qk38"]
+
+[ext_resource type="Script" uid="uid://cnv7brx35tw1v" path="res://scripts/scenes/base.gd" id="1_pvqg0"]
+
+[node name="Node2D" type="Node2D" unique_id=1288291301]
+script = ExtResource("1_pvqg0")
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=386813440]
+
+[node name="HUD" type="Control" parent="UI" unique_id=287350068]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+metadata/_edit_use_anchors_ = true
+
+[node name="Popup" type="Control" parent="UI" unique_id=553985876]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_use_anchors_ = true
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1797547584]
+position = Vector2(273, 483)
+position_smoothing_enabled = true
+rotation_smoothing_enabled = true

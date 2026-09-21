@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://igl3wbkcymrn"]
+
+[ext_resource type="PackedScene" uid="uid://bxp5t8ix6qk38" path="res://scenes/base.tscn" id="1_tmhu6"]
+[ext_resource type="Script" uid="uid://4f81yun5t64l" path="res://scripts/scenes/ranking.gd" id="2_6t2tb"]
+
+[node name="Node2D" unique_id=1288291301 instance=ExtResource("1_tmhu6")]
+script = ExtResource("2_6t2tb")
