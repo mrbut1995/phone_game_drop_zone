@@ -1,0 +1,63 @@
+=============================================================================
+             DROP ZONE - BẢNG ÁNH XẠ PHÍM ĐIỀU KHIỂN DEBUG (DEBUG INPUT MAP)
+=============================================================================
+
+Game được thiết kế dành cho thiết bị di động Android với cảm biến gia tốc / con quay
+hồi chuyển (Tilt/Gyroscope). Để hỗ trợ phát triển và kiểm thử tiện lợi trên máy tính (PC),
+hệ thống Debug Keyboard Simulator đã được tích hợp sẵn.
+
+-----------------------------------------------------------------------------
+1. PHÍM ĐIỀU KHIỂN NGHIÊNG MÁY (TILT SIMULATION)
+-----------------------------------------------------------------------------
+- [A] hoặc [Mũi tên Trái]  : Nghiêng máy sang TRÁI (Tối đa -35 độ).
+- [D] hoặc [Mũi tên Phải] : Nghiêng máy sang PHẢI (Tối đa +35 độ).
+- Nhả phím                : Góc nghiêng tự động hồi về 0 độ (vị trí cân bằng).
+- [C]                     : Calibrate / Hiệu chỉnh điểm 0 (Lấy góc hiện tại làm mốc 0 độ).
+
+*Lưu ý cơ chế vật lý:
+ - Deadzone 4 độ: Trong phạm vi ±4 độ quanh vị trí cân bằng sẽ không tạo lực đẩy ngang.
+ - Đường cong phi tuyến (Power curve 1.6): Nghiêng nhẹ lực nhỏ dễ căn chỉnh, nghiêng mạnh lực tăng nhanh.
+ - Damping: Tăng dần từ 3.5 lên 6.3 khi nhân vật hạ thấp dần gần mặt đất, tạo cảm giác lướt quán tính.
+
+-----------------------------------------------------------------------------
+2. PHÍM ĐIỀU KHIỂN VÒNG LẶP GAMEPLAY (GAMEPLAY SHORTCUTS)
+-----------------------------------------------------------------------------
+- [Space] (Dấu cách)      : THẢ NGAY (Bỏ qua đếm ngược 3 giây, thả nhân vật rơi lập tức).
+- [R]                     : RESET / Khởi động lại lượt chơi hiện tại.
+- [G]                     : KÍCH HOẠT GIÓ GIẬT DEBUG (Trigger sudden wind gust với cảnh báo trước 0.8s).
+- [P] hoặc [Escape]       : Tạm dừng / Tiếp tục (Pause / Resume).
+
+-----------------------------------------------------------------------------
+3. CHUYỂN ĐỔI CHẾ ĐỘ CHƠI (GAME MODES)
+-----------------------------------------------------------------------------
+- [Phím 1]                : Chế độ CHIẾN DỊCH / LEVEL (Campaign Mode)
+                            - Giới hạn 5 nhân vật mỗi màn.
+                            - Cần tích lũy đủ điểm ngưỡng (Target Score) để Chiến thắng (Victory).
+                            - Điểm không đủ khi hết quân -> Thất bại (Defeat).
+- [Phím 2]                : Chế độ VÔ TẬN (Endless Mode)
+                            - Thả liên tục không giới hạn số lượng quân.
+                            - Gió và hướng gió biến thiên liên tục.
+                            - Tích lũy Combo (nhân điểm liên tiếp) để đạt Điểm kỷ lục (Highscore).
+- [Phím 3]                : Chế độ LUYỆN TẬP (Practice / Sandbox Mode)
+                            - Tự do thử nghiệm góc nghiêng và hướng gió không áp lực điểm số.
+
+-----------------------------------------------------------------------------
+4. HIỂN THỊ THÔNG SỐ DEBUG & TELEMETRY
+-----------------------------------------------------------------------------
+- [Tab]                   : Bật / Tắt bảng thông số kỹ thuật (Debug HUD Overlay).
+                            - Hiển thị góc nghiêng thô (Raw Angle).
+                            - Góc sau khi qua Deadzone & Curve (Curved Tilt).
+                            - Lực ngang tổng (Total Horizontal Force = Tilt + Wind).
+                            - Vận tốc X / Vận tốc rơi Y (Velocity).
+                            - Độ cao hiện tại (Altitude).
+                            - FPS hiện tại.
+
+-----------------------------------------------------------------------------
+5. CÁCH TÍNH ĐIỂM HỒNG TÂM (TARGET BULLSEYE)
+-----------------------------------------------------------------------------
+- Vòng tâm (Bullseye đỏ)  : 100 Điểm (Kèm hiệu ứng Perfect và cộng dồn Combo)
+- Vòng 2 (Vàng/Cam)       : 70 Điểm
+- Vòng 3 (Xanh dương)     : 40 Điểm
+- Vòng ngoài (Xám nhạt)   : 20 Điểm
+- Trượt ra ngoài          : 0 Điểm
+- Landing Assist          : Dung sai 6px hỗ trợ người chơi ở ranh giới giữa 2 vòng điểm.

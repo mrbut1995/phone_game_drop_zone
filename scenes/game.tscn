@@ -14,7 +14,6 @@
 script = ExtResource("2_yqjtg")
 
 [node name="Controllers" type="Node" parent="." index="0" unique_id=1206564580]
-script = ExtResource("3_gee14")
 
 [node name="GameLogicController" type="Node" parent="Controllers" index="0" unique_id=1436944778]
 script = ExtResource("3_lbhrr")

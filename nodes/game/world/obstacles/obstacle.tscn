@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cb5k2yam8w1q3"]
+
+[ext_resource type="Script" uid="uid://bgg183q21lx1b" path="res://scripts/nodes/game/world/obstacles/obstacle.gd" id="1_7hxl5"]
+
+[node name="Obstacle" type="Node2D" unique_id=1416784695]
+script = ExtResource("1_7hxl5")

@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cx61k8w1q3m2y"]
+
+[ext_resource type="Script" path="res://scripts/nodes/game/world/target_zone.gd" id="1_4d1s7"]
+
+[node name="TargetZone" type="Node2D"]
+script = ExtResource("1_4d1s7")
