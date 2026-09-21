@@ -1,6 +1,6 @@
 # Bia hồng tâm mục tiêu (Target Bullseye)
 class_name TargetZone
-extends Node2D
+extends WorldActor
 
 const RADIUS_100: float = 22.0
 const RADIUS_70: float = 50.0

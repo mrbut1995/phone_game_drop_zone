@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://yg5plv3gu820"]
+
+[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_0v430"]
+[ext_resource type="Script" uid="uid://stxnw0bhkjsp" path="res://scripts/nodes/game/world/obstacles/bird.gd" id="2_bnquk"]
+
+[node name="Obstacle" unique_id=1416784695 instance=ExtResource("1_0v430")]
+script = ExtResource("2_bnquk")

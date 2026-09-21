@@ -2,12 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8owhoqvbvc0d"
-valid=false
+uid="uid://bf2lii6w48rmx"
+path="res://.godot/imported/parachute.svg-b32c97555d3f90148fc848eea58836a9.ctex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
 source_file="res://assets/images/placeholder/parachute.svg"
+dest_files=["res://.godot/imported/parachute.svg-b32c97555d3f90148fc848eea58836a9.ctex"]
 
 [params]
 

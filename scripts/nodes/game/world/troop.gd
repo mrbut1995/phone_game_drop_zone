@@ -22,6 +22,12 @@ var current_tilt_force: float = 0.0
 var current_wind_force: float = 0.0
 var has_landed: bool = false
 
+# Biến tác động từ Vùng đặc biệt (Special Zones)
+var zone_updraft_lift: float = 0.0
+var zone_gravity_multiplier: float = 1.0
+var zone_tilt_multiplier: float = 1.0
+var zone_horizontal_push: float = 0.0
+
 # Visual & trail
 var trail_points: Array[Vector2] = []
 var max_trail_points: int = 18
@@ -50,6 +56,10 @@ func init_troop(drop_pos: Vector2, target_ground_y: float) -> void:
 	trail_points.clear()
 	squash_stretch = Vector2.ONE
 	is_squashing = false
+	zone_updraft_lift = 0.0
+	zone_gravity_multiplier = 1.0
+	zone_tilt_multiplier = 1.0
+	zone_horizontal_push = 0.0
 	queue_redraw()
 
 func start_drop() -> void:
@@ -60,6 +70,18 @@ func start_drop() -> void:
 func apply_forces(tilt_f: float, wind_f: float) -> void:
 	current_tilt_force = tilt_f
 	current_wind_force = wind_f
+
+func apply_updraft_lift(lift_f: float, _delta: float) -> void:
+	zone_updraft_lift = max(zone_updraft_lift, lift_f)
+
+func apply_thin_air_fall(mult: float, _delta: float) -> void:
+	zone_gravity_multiplier = max(zone_gravity_multiplier, mult)
+
+func apply_turbulence_damp(mult: float, _delta: float) -> void:
+	zone_tilt_multiplier = min(zone_tilt_multiplier, mult)
+
+func apply_horizontal_push(push_f: float, _delta: float) -> void:
+	zone_horizontal_push += push_f
 
 func _physics_process(delta: float) -> void:
 	if not is_active:
@@ -72,18 +94,21 @@ func _physics_process(delta: float) -> void:
 
 	fall_time += delta
 	
-	# 1. Rơi theo chiều dọc (Y-axis) với Easing 0.3s đầu theo GDD 12.2
+	# 1. Rơi theo chiều dọc (Y-axis) có tính đến Easing 0.3s đầu và Zone effects (Updraft / Thin Air)
+	var effective_gravity = GRAVITY * zone_gravity_multiplier - zone_updraft_lift
 	if fall_time < 0.3:
 		var t_ratio = fall_time / 0.3
 		var ease_out = 1.0 - (1.0 - t_ratio) * (1.0 - t_ratio)
-		velocity.y = GRAVITY * fall_time * ease_out
+		velocity.y = max(0.0, effective_gravity * fall_time * ease_out)
 	else:
-		velocity.y += GRAVITY * delta
+		velocity.y += effective_gravity * delta
 		
-	velocity.y = min(velocity.y, MAX_FALL_SPEED)
+	var max_fall = MAX_FALL_SPEED * (1.3 if zone_gravity_multiplier > 1.0 else 1.0)
+	velocity.y = clamp(velocity.y, 40.0, max_fall)
 	
-	# 2. Lực ngang tổng & Damping theo GDD 12.5
-	var total_force_x: float = current_tilt_force + current_wind_force
+	# 2. Lực ngang tổng & Damping theo GDD 12.5 (kết hợp Turbulence & Wind Push)
+	var effective_tilt = current_tilt_force * zone_tilt_multiplier
+	var total_force_x: float = effective_tilt + current_wind_force + zone_horizontal_push
 	
 	# Damping tăng dần khi gần mặt đất (3.5 -> 6.3)
 	var current_fall_progress: float = clamp((position.y - start_y) / total_fall_distance, 0.0, 1.0)
@@ -96,6 +121,12 @@ func _physics_process(delta: float) -> void:
 	
 	# Cập nhật vị trí
 	position += velocity * delta
+	
+	# Reset hiệu ứng zone cho frame kế tiếp (sẽ được cập nhật lại nếu vẫn ở trong zone)
+	zone_updraft_lift = 0.0
+	zone_gravity_multiplier = 1.0
+	zone_tilt_multiplier = 1.0
+	zone_horizontal_push = 0.0
 	
 	# Giới hạn biên màn hình trái/phải (540px)
 	position.x = clamp(position.x, 25.0, 515.0)

@@ -55,6 +55,51 @@ func _init_default_levels() -> void:
 	l3.obstacle_count = 2
 	levels.append(l3)
 
+	# Màn 4: Đàn chim, Khinh khí cầu và Cột khí nóng
+	var l4 = LevelData.new()
+	l4.level_number = 4
+	l4.level_name = "Màn 4: Không Phận Phức Tạp"
+	l4.total_troops = 5
+	l4.target_score = 360
+	l4.base_wind_min = -140.0
+	l4.base_wind_max = 140.0
+	l4.gust_interval = 4.0
+	l4.target_moving = true
+	l4.target_speed = 1.6
+	l4.target_move_range = 120.0
+	l4.obstacle_count = 3
+	levels.append(l4)
+
+	# Màn 5: Công trình đô thị (Cần cẩu + Dây điện + Máy bay)
+	var l5 = LevelData.new()
+	l5.level_number = 5
+	l5.level_name = "Màn 5: Vượt Chướng Ngại Đô Thị"
+	l5.total_troops = 5
+	l5.target_score = 380
+	l5.base_wind_min = -150.0
+	l5.base_wind_max = 150.0
+	l5.gust_interval = 3.8
+	l5.target_moving = true
+	l5.target_speed = 1.8
+	l5.target_move_range = 130.0
+	l5.obstacle_count = 3
+	levels.append(l5)
+
+	# Màn 6: Bão gió xoáy Turbulence, Túi khí loãng và Đĩa bay UFO
+	var l6 = LevelData.new()
+	l6.level_number = 6
+	l6.level_name = "Màn 6: Bão Xoáy & Bí Ẩn Không Gian"
+	l6.total_troops = 5
+	l6.target_score = 400
+	l6.base_wind_min = -180.0
+	l6.base_wind_max = 180.0
+	l6.gust_interval = 3.2
+	l6.target_moving = true
+	l6.target_speed = 2.0
+	l6.target_move_range = 140.0
+	l6.obstacle_count = 4
+	levels.append(l6)
+
 func get_current_level_data() -> LevelData:
 	if levels.is_empty():
 		_init_default_levels()

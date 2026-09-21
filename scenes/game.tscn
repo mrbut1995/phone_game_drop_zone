@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://cvja5uqtvmejh" path="res://scripts/controller/WorldController.gd" id="6_u5sy4"]
 [ext_resource type="Script" uid="uid://dk62uai31vdp0" path="res://scripts/controller/InputController.gd" id="7_u5sy4"]
 [ext_resource type="Script" uid="uid://cq5hrg0vrlfhe" path="res://scripts/controller/LevelController.gd" id="9_0tnpc"]
+[ext_resource type="Script" uid="uid://b87j7571y0ane" path="res://scripts/controller/SpawnerController.gd" id="10_vtaks"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
 script = ExtResource("2_yqjtg")
@@ -35,5 +36,8 @@ script = ExtResource("3_gee14")
 
 [node name="LevelController" type="Node" parent="Controllers" index="6" unique_id=751596711]
 script = ExtResource("9_0tnpc")
+
+[node name="SpawnerController" type="Node" parent="Controllers" index="7" unique_id=1214762905]
+script = ExtResource("10_vtaks")
 
 [node name="World" type="Node2D" parent="." index="1" unique_id=256545867]

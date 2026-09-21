@@ -8,6 +8,7 @@ extends BaseScene
 @onready var input_controller: InputController = $Controllers/InputController
 @onready var wind_controller: WindController = $Controllers/WindController
 @onready var level_controller: LevelController = $Controllers/LevelController
+@onready var spawner_controller: SpawnerController = $Controllers/SpawnerController
 
 @onready var world_node: Node2D = $World
 @onready var hud_node: Control = $UI/HUD
@@ -22,7 +23,8 @@ func _ready() -> void:
 	
 	# 2. Khởi tạo và thiết lập các Controller View
 	ui_controller.setup(hud_node, popup_node)
-	world_controller.setup(world_node, camera_2d)
+	spawner_controller.setup(world_node)
+	world_controller.setup(world_node, camera_2d, spawner_controller)
 	
 	# 3. Kết nối Controllers thông qua GameLogicController
 	game_logic_controller.setup(
@@ -32,7 +34,8 @@ func _ready() -> void:
 		level_controller,
 		world_controller,
 		ui_controller,
-		sfx_controller
+		sfx_controller,
+		spawner_controller
 	)
 	
 	# 4. Bắt đầu vòng lặp game ở chế độ Campaign

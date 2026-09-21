@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_obs"]
+[ext_resource type="Script" path="res://scripts/nodes/game/world/obstacles/thin_air_zone.gd" id="2_taz"]
+
+[node name="Obstacle" instance=ExtResource("1_obs")]
+script = ExtResource("2_taz")

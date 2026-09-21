@@ -6,6 +6,7 @@ signal troop_hit_obstacle(obstacle: Node2D)
 
 @export var world_node: Node2D
 @export var camera: Camera2D
+@export var spawner_controller: SpawnerController
 
 var active_troop: Troop = null
 var target_zone: TargetZone = null
@@ -14,9 +15,11 @@ var obstacles: Array[Obstacle] = []
 const DROP_START_POS: Vector2 = Vector2(270.0, 90.0)
 const GROUND_Y: float = 840.0
 
-func setup(p_world: Node2D, p_camera: Camera2D) -> void:
+func setup(p_world: Node2D, p_camera: Camera2D, p_spawner: SpawnerController = null) -> void:
 	world_node = p_world
 	camera = p_camera
+	if p_spawner != null:
+		spawner_controller = p_spawner
 	_ensure_world_elements()
 
 func _ensure_world_elements() -> void:
@@ -59,21 +62,23 @@ func apply_level_config(level_data: LevelData) -> void:
 			level_data.target_move_range
 		)
 		
-	# Dọn dẹp obstacles cũ
-	for obs in obstacles:
-		if is_instance_valid(obs):
-			obs.queue_free()
-	obstacles.clear()
-	
-	# Tạo obstacles mới theo level
-	for i in range(level_data.obstacle_count):
-		var obs = Obstacle.new()
-		world_node.add_child(obs)
-		var dir: float = 1.0 if i % 2 == 0 else -1.0
-		var speed: float = randf_range(60.0, 110.0)
-		var alt_y: float = 340.0 + float(i) * 160.0
-		obs.configure(speed, dir, alt_y)
-		obstacles.append(obs)
+	# Bàn giao việc tạo và quản lý obstacle cho SpawnerController
+	if spawner_controller:
+		spawner_controller.spawn_level_obstacles(level_data)
+	else:
+		# Fallback nếu chưa gán spawner_controller
+		for obs in obstacles:
+			if is_instance_valid(obs):
+				obs.queue_free()
+		obstacles.clear()
+		for i in range(level_data.obstacle_count):
+			var obs = BirdObstacle.new()
+			world_node.add_child(obs)
+			var dir: float = 1.0 if i % 2 == 0 else -1.0
+			var speed: float = randf_range(60.0, 110.0)
+			var alt_y: float = 340.0 + float(i) * 160.0
+			obs.configure(speed, dir, alt_y)
+			obstacles.append(obs)
 
 func prepare_troop_for_drop() -> void:
 	_ensure_world_elements()
@@ -90,9 +95,13 @@ func release_troop() -> void:
 	if active_troop:
 		active_troop.start_drop()
 
-func update_troop_forces(tilt_force: float, wind_force: float) -> void:
+func update_troop_forces(tilt_force: float, wind_force: float, delta: float = 0.0) -> void:
 	if active_troop and active_troop.is_active:
 		active_troop.apply_forces(tilt_force, wind_force)
+		
+		# Kiểm tra tương tác vật lý với các chướng ngại vật và vùng đặc biệt
+		if spawner_controller:
+			spawner_controller.check_troop_interactions(active_troop, delta)
 		
 		# Camera bám theo độ cao của nhân vật
 		if camera:

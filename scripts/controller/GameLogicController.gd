@@ -16,6 +16,7 @@ var level_ctrl: LevelController
 var world_ctrl: WorldController
 var ui_ctrl: UIController
 var sfx_ctrl: SfxController
+var spawner_ctrl: SpawnerController
 
 # Timers
 var countdown_timer: float = 3.0
@@ -29,7 +30,8 @@ func setup(
 	p_level: LevelController,
 	p_world: WorldController,
 	p_ui: UIController,
-	p_sfx: SfxController
+	p_sfx: SfxController,
+	p_spawner: SpawnerController = null
 ) -> void:
 	game_state = p_state
 	input_ctrl = p_input
@@ -38,6 +40,7 @@ func setup(
 	world_ctrl = p_world
 	ui_ctrl = p_ui
 	sfx_ctrl = p_sfx
+	spawner_ctrl = p_spawner
 	
 	_connect_signals()
 
@@ -108,9 +111,9 @@ func _process(delta: float) -> void:
 	if game_state.round_state == GameState.RoundState.FALLING:
 		var troop = world_ctrl.active_troop
 		if troop and troop.is_active:
-			# Áp dụng lực tilt và gió
+			# Áp dụng lực tilt và gió (kèm delta để kiểm tra tương tác obstacle & special zones)
 			var wind_at_alt = wind_ctrl.get_wind_at_altitude(troop.position.y, world_ctrl.GROUND_Y)
-			world_ctrl.update_troop_forces(input_ctrl.tilt_force, wind_at_alt)
+			world_ctrl.update_troop_forces(input_ctrl.tilt_force, wind_at_alt, delta)
 			
 			# Cập nhật Telemetry
 			ui_ctrl.update_debug_telemetry(
@@ -191,9 +194,39 @@ func _on_world_troop_landed(land_pos: Vector2) -> void:
 	tw.tween_callback(_handle_round_transition)
 
 func _on_world_troop_hit_obstacle(obs: Node2D) -> void:
-	# Chạm vật cản -> Rơi hỏng lượt
+	if game_state.round_state != GameState.RoundState.FALLING:
+		return
+		
+	# GDD Section 6: Va chạm vật cản nguy hiểm -> Thất bại lượt / mất điểm
+	game_state.round_state = GameState.RoundState.LANDED
+	
+	var troop = world_ctrl.active_troop
+	var hit_pos = troop.position if troop else Vector2(270, 500)
+	if troop:
+		troop.is_active = false
+		
+	# Tính 0 điểm lượt này và reset combo
+	var final_points = game_state.add_landing_score(0, 999.0, "VA CHẠM VẬT CẢN!")
+	var fail_eval: Dictionary = {
+		"points": 0,
+		"ring_name": "VA CHẠM!",
+		"distance": 999.0,
+		"color": Color(1.0, 0.25, 0.25),
+		"final_points": final_points,
+		"multiplier": 1
+	}
+	
+	world_ctrl.spawn_floating_score(fail_eval, hit_pos)
+	
 	if sfx_ctrl:
 		sfx_ctrl.play_miss()
+		
+	ui_ctrl.update_score(game_state.current_score, game_state.target_score, game_state.combo_multiplier)
+	troop_landed_evaluated.emit(fail_eval)
+	
+	var tw = create_tween()
+	tw.tween_interval(1.3)
+	tw.tween_callback(_handle_round_transition)
 
 func _handle_round_transition() -> void:
 	var has_next: bool = game_state.next_troop()

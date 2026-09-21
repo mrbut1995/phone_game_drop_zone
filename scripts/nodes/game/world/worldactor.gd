@@ -7,3 +7,6 @@ var is_active: bool = false
 func reset_actor() -> void:
 	velocity = Vector2.ZERO
 	is_active = false
+
+func acting(delta: float) -> void:
+	pass
