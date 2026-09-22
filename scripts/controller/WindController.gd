@@ -2,6 +2,7 @@ class_name WindController
 extends Node
 
 signal wind_updated(total_wind: float, base_wind: float, gust_wind: float)
+signal wind_clock_updated(current_wind: float, predicted_wind: float)
 signal gust_warning(direction: float, duration: float)
 signal gust_started(direction: float, force: float)
 signal gust_ended
@@ -9,6 +10,7 @@ signal gust_ended
 var base_wind: float = 0.0
 var gust_wind: float = 0.0
 var total_wind: float = 0.0
+var predicted_wind: float = 0.0
 
 # Gust timers
 var gust_interval: float = 6.0
@@ -72,9 +74,20 @@ func _process(delta: float) -> void:
 		if gust_time_remaining <= 0:
 			_end_active_gust()
 			
-	# Tính tổng lực gió
+	# Tính tổng lực gió hiện tại
 	total_wind = base_wind + gust_wind
+	
+	# Dự báo gió sắp tới (Update_Feature.md Section 5.2): kim phụ dẫn trước 0.5 - 1s
+	if is_warning:
+		# Sắp có gió giật: kim phụ vọt trước về lực gió giật sắp tới
+		predicted_wind = base_wind + pending_gust_force
+	elif is_gusting:
+		predicted_wind = total_wind
+	else:
+		predicted_wind = base_wind
+		
 	wind_updated.emit(total_wind, base_wind, gust_wind)
+	wind_clock_updated.emit(total_wind, predicted_wind)
 
 func _start_active_gust() -> void:
 	is_warning = false

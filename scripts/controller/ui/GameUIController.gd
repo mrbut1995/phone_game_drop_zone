@@ -27,6 +27,8 @@ signal force_drop_pressed
 @onready var needle_tilt: ColorRect = %TiltNeedle
 @onready var lbl_tilt_deg: Label = %TiltDegLabel
 @onready var arrow_wind: Label = %WindLabel
+@onready var wind_clock: WindClock = %WindClock if has_node("%WindClock") else null
+@onready var lbl_coins: Label = %CoinsLabel if has_node("%CoinsLabel") else null
 
 # --- HUD: debug telemetry ---
 @onready var debug_panel: PanelContainer = %DebugPanel
@@ -98,6 +100,14 @@ func update_wind(total_wind: float) -> void:
 		arrow_wind.text = "Gió: >>> Thổi sang phải (+%.0f px/s)" % total_wind
 	else:
 		arrow_wind.text = "Gió: <<< Thổi sang trái (%.0f px/s)" % total_wind
+
+func update_wind_clock(total_w: float, predicted_w: float) -> void:
+	if wind_clock != null:
+		wind_clock.set_wind_data(total_w, predicted_w)
+
+func update_coins(coin_count: int) -> void:
+	if lbl_coins != null:
+		lbl_coins.text = "🪙 %d" % coin_count
 
 func show_gust_warning(dir: float, dur: float) -> void:
 	banner_gust.visible = true

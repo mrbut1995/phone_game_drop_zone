@@ -4,15 +4,26 @@ extends WorldActor
 
 signal landed(land_position: Vector2)
 signal hit_obstacle(obstacle: Node2D)
+signal shield_granted
+signal shield_broken
 
-# Các hằng số vật lý theo GDD Section 12
-const GRAVITY: float = 800.0
-const MAX_FALL_SPEED: float = 500.0
+# Các hằng số vật lý theo GDD Section 12 & Update_Feature.md Section 4
+const GRAVITY: float = 480.0
+const MAX_FALL_SPEED: float = 300.0
 const MAX_HORIZONTAL_SPEED: float = 350.0
 const BASE_DAMPING: float = 3.5
 const MAX_DAMPING_MULTIPLIER: float = 1.8
 # SVG gốc được vẽ ở tỉ lệ 2x -> scale 0.5 để khớp kích thước thiết kế (30x38 px)
 const SPRITE_SCALE: Vector2 = Vector2(0.5, 0.5)
+
+# Bảng màu dù/khăn phân biệt các nhân vật theo thứ tự thả (Update_Feature.md 6.2)
+const TROOP_COLORS: Array[Color] = [
+	Color(1.0, 1.0, 1.0),       # 0: Mặc định (Cam/Trắng)
+	Color(0.35, 0.9, 1.0),      # 1: Xanh ngọc Cyan
+	Color(1.0, 0.88, 0.25),     # 2: Vàng ánh kim
+	Color(0.95, 0.45, 0.95),    # 3: Tím hồng
+	Color(0.4, 1.0, 0.5)        # 4: Xanh lá mạ
+]
 
 # Tham chiếu node hiển thị (khai báo sẵn trong troop.tscn, không tạo runtime)
 @onready var body_sprite: AnimatedSprite2D = $Sprite
@@ -36,6 +47,15 @@ var zone_gravity_multiplier: float = 1.0
 var zone_tilt_multiplier: float = 1.0
 var zone_horizontal_push: float = 0.0
 
+# Khiên bảo vệ Shield Bubble / Aegis (Update_Feature.md 1.2)
+var has_shield: bool = false
+var invulnerable_timer: float = 0.0
+
+# Đánh dấu nhân vật gần chạm đất nhất (Update_Feature.md 3.2)
+var is_lead_troop: bool = false
+var troop_color_index: int = 0
+var anim_pulse_time: float = 0.0
+
 # Visual & trail
 var trail_points: Array[Vector2] = []
 var max_trail_points: int = 18
@@ -56,7 +76,7 @@ func _ready() -> void:
 	z_index = 10
 	_sync_visuals()
 
-func init_troop(drop_pos: Vector2, target_ground_y: float) -> void:
+func init_troop(drop_pos: Vector2, target_ground_y: float, color_idx: int = 0) -> void:
 	position = drop_pos
 	start_y = drop_pos.y
 	ground_y = target_ground_y
@@ -75,10 +95,41 @@ func init_troop(drop_pos: Vector2, target_ground_y: float) -> void:
 	is_knocked_out = false
 	knockout_spin = 0.0
 	overlapping_obstacle = null
+	has_shield = false
+	invulnerable_timer = 0.0
+	is_lead_troop = false
+	set_troop_color(color_idx)
 	if body_sprite != null:
 		body_sprite.rotation = 0.0
 		body_sprite.modulate = Color.WHITE
 	_sync_visuals()
+	queue_redraw()
+
+func set_troop_color(color_idx: int) -> void:
+	troop_color_index = posmod(color_idx, TROOP_COLORS.size())
+	var col = TROOP_COLORS[troop_color_index]
+	if parachute_sprite != null:
+		parachute_sprite.modulate = col
+	if scarf_line != null:
+		scarf_line.default_color = Color(col.r, col.g, col.b, 0.9)
+
+func grant_shield() -> void:
+	has_shield = true
+	shield_granted.emit()
+	queue_redraw()
+
+func break_shield() -> void:
+	has_shield = false
+	invulnerable_timer = 0.6 # Miễn nhiễm va chạm 0.6s sau khi vỡ khiên
+	shield_broken.emit()
+	_flash_shield_break()
+	queue_redraw()
+
+func _flash_shield_break() -> void:
+	if body_sprite != null:
+		var tw := create_tween()
+		tw.tween_property(body_sprite, "modulate", Color(0.2, 0.9, 1.0), 0.08)
+		tw.tween_property(body_sprite, "modulate", Color.WHITE, 0.3)
 
 func start_drop() -> void:
 	is_active = true
@@ -163,6 +214,11 @@ func _physics_process(delta: float) -> void:
 	var target_scarf: float = clamp((-velocity.x - current_wind_force * 0.3) * 0.15, -45.0, 45.0)
 	scarf_angle = lerp_angle(scarf_angle, deg_to_rad(target_scarf), delta * 8.0)
 
+	anim_pulse_time += delta
+	if invulnerable_timer > 0.0:
+		invulnerable_timer -= delta
+	queue_redraw()
+
 	# Kiểm tra chạm đất
 	if position.y >= ground_y:
 		position.y = ground_y
@@ -177,6 +233,7 @@ func _trigger_landing() -> void:
 	is_squashing = true
 	squash_timer = 0.0
 	landed.emit(position)
+	queue_redraw()
 
 func _process_squash(delta: float) -> void:
 	squash_timer += delta
@@ -196,10 +253,15 @@ func _process_squash(delta: float) -> void:
 	_sync_visuals()
 
 func on_obstacle_entered(obstacle: Node2D) -> void:
-	# Va chạm được tính NGAY lập tức. Trước đây có cửa sổ trễ 0.08s (coyote) nên obstacle
-	# nhỏ (chim r=12) bị xuyên qua mà không kích hoạt gì.
-	if has_landed or is_knocked_out:
+	# Va chạm được tính NGAY lập tức.
+	if has_landed or is_knocked_out or invulnerable_timer > 0.0:
 		return
+		
+	# Nếu có Shield Bubble -> Miễn 1 lần va chạm (Update_Feature.md 1.2)
+	if has_shield:
+		break_shield()
+		return
+		
 	overlapping_obstacle = obstacle
 	hit_obstacle.emit(obstacle)
 	overlapping_obstacle = null
@@ -275,3 +337,28 @@ func _sync_visuals() -> void:
 	# 4. Thân nhân vật: áp dụng hiệu ứng nén / giãn khi tiếp đất
 	if body_sprite != null:
 		body_sprite.scale = SPRITE_SCALE * squash_stretch
+
+func _draw() -> void:
+	# 1. Vẽ Vòng hào quang Lead Troop (Update_Feature.md 3.2: highlight nhân vật gần đất nhất)
+	if is_lead_troop and not has_landed and not is_knocked_out:
+		var pulse_scale = 1.0 + sin(anim_pulse_time * 6.0) * 0.12
+		var ring_alpha = 0.55 + sin(anim_pulse_time * 6.0) * 0.25
+		draw_arc(Vector2(0, 10.0), 16.0 * pulse_scale, 0.0, TAU, 24, Color(1.0, 0.85, 0.2, ring_alpha), 2.0)
+		# Mũi tên chỉ thị nhỏ
+		var arrow_y = -35.0 + sin(anim_pulse_time * 6.0) * 3.0
+		var arrow_pts: PackedVector2Array = PackedVector2Array([
+			Vector2(-4, arrow_y - 6),
+			Vector2(4, arrow_y - 6),
+			Vector2(0, arrow_y)
+		])
+		draw_colored_polygon(arrow_pts, Color(1.0, 0.85, 0.2, ring_alpha))
+
+	# 2. Vẽ Bong bóng khiên Shield Bubble (Update_Feature.md 1.2)
+	if has_shield and not has_landed and not is_knocked_out:
+		var bubble_pulse = 1.0 + sin(anim_pulse_time * 4.0) * 0.06
+		var bubble_radius = 24.0 * bubble_pulse
+		var bubble_col = Color(0.25, 0.85, 1.0, 0.35 + sin(anim_pulse_time * 5.0) * 0.1)
+		draw_circle(Vector2(0, -6.0), bubble_radius, bubble_col)
+		draw_arc(Vector2(0, -6.0), bubble_radius, 0.0, TAU, 28, Color(0.6, 0.95, 1.0, 0.8), 2.0)
+		# Điểm phản quang trên quả cầu khiên
+		draw_circle(Vector2(-7.0, -14.0), 3.5, Color(1.0, 1.0, 1.0, 0.65))

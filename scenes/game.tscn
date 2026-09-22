@@ -17,6 +17,7 @@
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_4.tscn" id="16_lvl4"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_5.tscn" id="17_lvl5"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_6.tscn" id="18_lvl6"]
+[ext_resource type="Script" path="res://scripts/nodes/ui/wind_clock.gd" id="19_wclock"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
 script = ExtResource("2_yqjtg")
@@ -26,7 +27,7 @@ layout_mode = 0
 anchor_right = 1.0
 offset_left = 16.0
 offset_top = 16.0
-offset_right = -16.0
+offset_right = -96.0
 
 [node name="Row1" type="HBoxContainer" parent="UI/HUD/TopBar" index="0" unique_id=302962879]
 layout_mode = 2
@@ -61,6 +62,13 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.2, 1)
 theme_override_font_sizes/font_size = 16
 
+[node name="CoinsLabel" type="Label" parent="UI/HUD/TopBar/Row2" index="2" unique_id=1446223356]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 16
+text = "🪙 0"
+
 [node name="ScoreProgress" type="ProgressBar" parent="UI/HUD/TopBar" index="2" unique_id=721501282]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 8)
@@ -74,6 +82,17 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 14
 text = "Lính: 1 / 5"
+
+[node name="WindClock" type="Control" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="1" unique_id=987654321]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -88.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 88.0
+script = ExtResource("19_wclock")
 
 [node name="CountdownLabel" type="Label" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="1" unique_id=2019584755]
 unique_name_in_owner = true
@@ -299,5 +318,7 @@ world_node = NodePath("../../World")
 [connection signal="toggle_debug_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="_on_toggle_debug_requested"]
 [connection signal="gust_warning" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_gust_warning"]
 [connection signal="wind_updated" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_wind_updated"]
+[connection signal="wind_clock_updated" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_wind_clock_updated"]
+[connection signal="item_collected" from="Controllers/SpawnerController" to="Controllers/GameLogicController" method="_on_item_collected"]
 [connection signal="level_loaded" from="Controllers/LevelController" to="Controllers/WorldController" method="_on_level_loaded"]
 [connection signal="level_loaded" from="Controllers/LevelController" to="Controllers/SpawnerController" method="_on_level_loaded"]

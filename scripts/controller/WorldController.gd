@@ -3,6 +3,8 @@ extends Node
 
 signal troop_landed(landing_pos: Vector2)
 signal troop_hit_obstacle(obstacle: Node2D)
+signal individual_troop_landed(troop: Troop, landing_pos: Vector2)
+signal individual_troop_hit_obstacle(troop: Troop, obstacle: Node2D)
 
 # Tham chiếu được gán trực tiếp trong game.tscn
 @export var world_node: Node2D
@@ -11,14 +13,15 @@ signal troop_hit_obstacle(obstacle: Node2D)
 
 # Scene hiệu ứng nổ khi va chạm - đổi được trong Inspector nếu muốn art khác
 @export var hit_effect_scene: PackedScene = preload("res://nodes/game/world/fx/hit_effect.tscn")
+const TROOP_SCENE: PackedScene = preload("res://nodes/game/world/player/troop.tscn")
 
-var active_troop: Troop = null
+var active_troop: Troop = null # Troop dẫn đầu (gần đất nhất)
+var active_troops: Array[Troop] = [] # Danh sách toàn bộ troop đang hoạt động (Update_Feature.md Section 2)
 var target_zone: TargetZone = null
 var current_level: BaseLevel = null
 
 const DROP_START_POS: Vector2 = Vector2(270.0, 90.0)
 const DEFAULT_GROUND_Y: float = 840.0
-# Cao độ mặt đất thực tế của màn đang chơi (lấy từ BaseLevel.ground_y)
 var ground_y: float = DEFAULT_GROUND_Y
 
 func _ready() -> void:
@@ -28,19 +31,21 @@ func _ensure_world_elements() -> void:
 	if world_node == null:
 		return
 
-	# Troop + TargetZone được khai báo sẵn trong scene (không tạo node bằng code)
 	target_zone = world_node.get_node_or_null("TargetZone") as TargetZone
-	active_troop = world_node.get_node_or_null("Troop") as Troop
 	if target_zone == null:
 		push_warning("WorldController: thiếu node World/TargetZone trong scene")
-	if active_troop == null:
-		push_warning("WorldController: thiếu node World/Troop trong scene")
-		return
+		
+	var default_troop = world_node.get_node_or_null("Troop") as Troop
+	if default_troop != null and not active_troops.has(default_troop):
+		active_troops.append(default_troop)
+		active_troop = default_troop
+		_bind_troop_signals(default_troop)
 
-	if not active_troop.landed.is_connected(_on_troop_landed):
-		active_troop.landed.connect(_on_troop_landed)
-	if not active_troop.hit_obstacle.is_connected(_on_troop_hit_obstacle):
-		active_troop.hit_obstacle.connect(_on_troop_hit_obstacle)
+func _bind_troop_signals(troop: Troop) -> void:
+	if not troop.landed.is_connected(_on_troop_landed_handler):
+		troop.landed.connect(func(pos): _on_troop_landed_handler(troop, pos))
+	if not troop.hit_obstacle.is_connected(_on_troop_hit_obstacle_handler):
+		troop.hit_obstacle.connect(func(obs): _on_troop_hit_obstacle_handler(troop, obs))
 
 # Nối với signal "level_loaded" của LevelController trong game.tscn
 func _on_level_loaded(level: BaseLevel) -> void:
@@ -51,7 +56,6 @@ func apply_level(level: BaseLevel) -> void:
 	if level == null or world_node == null:
 		return
 
-	# Gỡ màn cũ (nếu có) và đưa màn mới vào dưới cùng của World
 	if is_instance_valid(current_level):
 		world_node.remove_child(current_level)
 		current_level.queue_free()
@@ -61,42 +65,83 @@ func apply_level(level: BaseLevel) -> void:
 
 	ground_y = level.ground_y
 
-	# Cấu hình bia mục tiêu theo dữ liệu khai báo trong Level scene.
-	# Obstacle đã được SpawnerController sinh ra theo marker (xem _on_level_loaded bên đó).
 	_ensure_world_elements()
 	if target_zone:
 		level.configure_target_zone(target_zone)
 
-func prepare_troop_for_drop() -> void:
+# Dọn dẹp toàn bộ troops cũ khi reset hoặc đổi màn
+func clear_all_troops() -> void:
+	for t in active_troops:
+		if is_instance_valid(t):
+			t.queue_free()
+	active_troops.clear()
+	active_troop = null
+
+# Tạo một Troop mới trong chế độ Continuous Drop (Update_Feature.md Section 2)
+func spawn_continuous_troop(spawn_x: float, color_idx: int) -> Troop:
 	_ensure_world_elements()
-	if active_troop:
-		# Điểm xuất phát hơi ngẫu nhiên nhẹ quanh tâm (240 - 300)
-		var start_x = randf_range(250.0, 290.0)
-		active_troop.init_troop(Vector2(start_x, DROP_START_POS.y), ground_y)
+	var troop: Troop = TROOP_SCENE.instantiate() as Troop
+	if troop == null:
+		return null
 		
+	world_node.add_child(troop)
+	_bind_troop_signals(troop)
+	
+	var drop_pos = Vector2(spawn_x, DROP_START_POS.y)
+	troop.init_troop(drop_pos, ground_y, color_idx)
+	troop.start_drop()
+	active_troops.append(troop)
+	return troop
+
+# Chuẩn bị cho lượt đầu tiên
+func prepare_troop_for_drop() -> void:
+	clear_all_troops()
 	if camera:
 		camera.position = Vector2(270.0, 480.0)
 		camera.offset = Vector2.ZERO
 		camera.zoom = Vector2.ONE
 
-func release_troop() -> void:
-	if active_troop:
-		active_troop.start_drop()
-
+# Áp dụng Unified Tilt lên TOÀN BỘ các nhân vật đang rơi đồng thời (Update_Feature.md Section 3)
 func update_troop_forces(tilt_force: float, wind_force: float, delta: float = 0.0) -> void:
-	if active_troop and active_troop.is_active:
-		active_troop.apply_forces(tilt_force, wind_force)
+	# 1. Dọn dẹp troop không còn hợp lệ
+	var i = active_troops.size() - 1
+	while i >= 0:
+		if not is_instance_valid(active_troops[i]):
+			active_troops.remove_at(i)
+		i -= 1
 		
-		# Kiểm tra tương tác vật lý với các chướng ngại vật và vùng đặc biệt
-		if spawner_controller:
-			spawner_controller.check_troop_interactions(active_troop, delta)
-		
-		# Camera bám theo độ cao của nhân vật
-		if camera:
-			var target_cam_y = clamp(active_troop.position.y + 120.0, 480.0, ground_y - 240.0)
-			camera.position.y = lerp(camera.position.y, target_cam_y, 0.08)
+	if active_troops.is_empty():
+		return
 
-func _on_troop_landed(pos: Vector2) -> void:
+	# 2. Tìm nhân vật gần chạm đất nhất (Lead Troop) để highlight (Update_Feature.md 3.2)
+	var max_y: float = -9999.0
+	var lead: Troop = null
+	for t in active_troops:
+		if is_instance_valid(t) and t.is_active and not t.has_landed:
+			if t.position.y > max_y:
+				max_y = t.position.y
+				lead = t
+
+	active_troop = lead
+	for t in active_troops:
+		if is_instance_valid(t):
+			t.is_lead_troop = (t == lead)
+
+	# 3. Tác động lực ngang tổng và kiểm tra va chạm / nhặt item cho từng nhân vật
+	for t in active_troops:
+		if is_instance_valid(t) and (t.is_active or t.is_knocked_out):
+			if t.is_active:
+				t.apply_forces(tilt_force, wind_force)
+			if spawner_controller:
+				spawner_controller.check_troop_interactions(t, delta)
+
+	# 4. Camera bám mượt theo nhân vật dẫn đầu
+	if camera and lead != null:
+		var target_cam_y = clamp(lead.position.y + 120.0, 480.0, ground_y - 240.0)
+		camera.position.y = lerp(camera.position.y, target_cam_y, 0.08)
+
+func _on_troop_landed_handler(troop: Troop, pos: Vector2) -> void:
+	individual_troop_landed.emit(troop, pos)
 	troop_landed.emit(pos)
 	
 	# Zoom nhẹ camera vào khoảnh khắc chạm đất (GDD 7.4)
@@ -106,7 +151,8 @@ func _on_troop_landed(pos: Vector2) -> void:
 		tw.tween_interval(0.6)
 		tw.tween_property(camera, "zoom", Vector2.ONE, 0.3)
 
-func _on_troop_hit_obstacle(obs: Node2D) -> void:
+func _on_troop_hit_obstacle_handler(troop: Troop, obs: Node2D) -> void:
+	individual_troop_hit_obstacle.emit(troop, obs)
 	troop_hit_obstacle.emit(obs)
 
 # Phản hồi khi lính đụng chướng ngại vật: hiệu ứng nổ + rung camera
@@ -114,7 +160,6 @@ func play_hit_feedback(hit_pos: Vector2) -> void:
 	if world_node == null:
 		return
 
-	# Hiệu ứng nổ tại điểm va chạm (scene khai báo sẵn, tự huỷ khi hết animation)
 	if hit_effect_scene != null:
 		var fx := hit_effect_scene.instantiate() as HitEffect
 		if fx != null:
@@ -138,21 +183,22 @@ func _shake_camera(duration: float = 0.32, magnitude: float = 14.0) -> void:
 # Hiệu ứng nổi chữ điểm số (Floating text) tại vị trí đáp
 func spawn_floating_score(score_info: Dictionary, land_pos: Vector2) -> void:
 	var label = Label.new()
-	var text_str: String = "+%d %s" % [score_info["points"], score_info["ring_name"]]
-	if score_info.has("multiplier") and score_info["multiplier"] > 1:
-		text_str += "\nCOMBO x%d!" % score_info["multiplier"]
+	var text_str: String = score_info.get("text", "")
+	if text_str == "":
+		text_str = "+%d %s" % [score_info.get("points", 0), score_info.get("ring_name", "")]
+		if score_info.has("multiplier") and score_info["multiplier"] > 1:
+			text_str += "\nCOMBO x%d!" % score_info["multiplier"]
 		
 	label.text = text_str
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.position = land_pos + Vector2(-120, -50)
 	label.size = Vector2(240, 50)
-	label.add_theme_color_override("font_color", score_info["color"])
-	label.add_theme_font_size_override("font_size", 20 if score_info["points"] >= 70 else 16)
+	label.add_theme_color_override("font_color", score_info.get("color", Color.WHITE))
+	label.add_theme_font_size_override("font_size", 20 if score_info.get("points", 0) >= 70 else 16)
 	label.z_index = 25
 	world_node.add_child(label)
 	
-	# Tween bay lên và mờ dần
 	var tw = create_tween()
 	tw.set_parallel(true)
 	tw.tween_property(label, "position:y", label.position.y - 70.0, 1.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)

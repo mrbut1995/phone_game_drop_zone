@@ -21,6 +21,7 @@ signal state_changed(new_state: RoundState)
 signal score_changed(current_score: int, target_score: int, combo: int)
 signal troop_count_changed(current_index: int, total_troops: int)
 signal mode_changed(new_mode: GameMode)
+signal coins_changed(total_coins: int)
 
 var game_mode: GameMode = GameMode.CAMPAIGN:
 	set(value):
@@ -38,6 +39,7 @@ var combo_count: int = 0
 var combo_multiplier: int = 1
 var current_troop_index: int = 0
 var total_troops: int = 5
+var coins: int = 0
 var landing_history: Array[Dictionary] = []
 var high_score: int = 0
 var countdown_time_left: float = 3.0
@@ -47,7 +49,7 @@ func reset_for_new_game(mode: GameMode, level: BaseLevel = null) -> void:
 	current_score = 0
 	combo_count = 0
 	combo_multiplier = 1
-	current_troop_index = 1
+	current_troop_index = 0
 	landing_history.clear()
 	
 	if level != null:
@@ -65,7 +67,17 @@ func reset_for_new_game(mode: GameMode, level: BaseLevel = null) -> void:
 		
 	score_changed.emit(current_score, target_score, combo_multiplier)
 	troop_count_changed.emit(current_troop_index, total_troops)
+	coins_changed.emit(coins)
 	round_state = RoundState.IDLE
+
+func add_coins(amount: int = 1) -> void:
+	coins += amount
+	coins_changed.emit(coins)
+
+func add_reinforcement(amount: int = 1) -> void:
+	if total_troops > 0:
+		total_troops += amount
+		troop_count_changed.emit(current_troop_index, total_troops)
 
 func add_landing_score(points: int, distance: float, ring_name: String) -> int:
 	var final_points: int = points

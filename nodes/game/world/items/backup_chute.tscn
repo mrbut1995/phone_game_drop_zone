@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/world/items/item.tscn" id="1_item"]
+[ext_resource type="Script" path="res://scripts/nodes/game/world/items/backup_chute.gd" id="2_chute"]
+
+[node name="BackupChute" instance=ExtResource("1_item")]
+script = ExtResource("2_chute")
