@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/level/Level.tscn" id="1_level"]
+[ext_resource type="Script" path="res://scripts/nodes/game/level/obstacle_spawn.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/bird.tscn" id="3_bird"]
+
+[node name="Level2" unique_id=242200477 instance=ExtResource("1_level")]
+level_number = 2
+level_name = "Màn 2: Gió Tạt Ngang"
+total_troops = 5
+target_score = 320
+base_wind_min = -90.0
+base_wind_max = 90.0
+gust_interval = 5.5
+
+[node name="Background" parent="." index="0"]
+modulate = Color(0.9, 0.96, 1, 1)
+
+[node name="BirdSpawn" type="Node2D" parent="SpawnObstacles" index="0"]
+position = Vector2(-40, 450)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("3_bird")
+direction = 1.0
+speed = 85.0

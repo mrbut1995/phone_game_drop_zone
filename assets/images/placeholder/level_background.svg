@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 1140" width="540" height="1140">
+  <defs>
+    <!-- Bầu trời (trung tính, level sẽ phủ modulate màu riêng) -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="55%" stop-color="#eef3f9" />
+      <stop offset="100%" stop-color="#dde6ef" />
+    </linearGradient>
+
+    <!-- Mặt đất -->
+    <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b9c2cc" />
+      <stop offset="100%" stop-color="#7e8b98" />
+    </linearGradient>
+  </defs>
+
+  <!-- 1. BẦU TRỜI -->
+  <rect x="0" y="0" width="540" height="840" fill="url(#skyGrad)" />
+
+  <!-- 2. MÂY MỜ TRANG TRÍ -->
+  <g fill="#ffffff" opacity="0.55">
+    <ellipse cx="90" cy="160" rx="70" ry="22" />
+    <ellipse cx="140" cy="150" rx="46" ry="18" />
+    <ellipse cx="420" cy="260" rx="80" ry="24" />
+    <ellipse cx="360" cy="248" rx="48" ry="18" />
+    <ellipse cx="220" cy="420" rx="64" ry="18" opacity="0.6" />
+  </g>
+
+  <!-- 3. ĐƯỜNG CHÂN TRỜI -->
+  <rect x="0" y="838" width="540" height="4" fill="#f4f8fc" />
+
+  <!-- 4. MẶT ĐẤT (mép trên đúng y = 840 để khớp GROUND_Y) -->
+  <rect x="0" y="842" width="540" height="298" fill="url(#groundGrad)" />
+
+  <!-- 5. VẠCH CỎ MÉP MẶT ĐẤT -->
+  <rect x="0" y="842" width="540" height="8" fill="#9fb0a4" opacity="0.9" />
+</svg>

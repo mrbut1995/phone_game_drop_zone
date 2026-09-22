@@ -11,6 +11,14 @@ const MAX_FALL_SPEED: float = 500.0
 const MAX_HORIZONTAL_SPEED: float = 350.0
 const BASE_DAMPING: float = 3.5
 const MAX_DAMPING_MULTIPLIER: float = 1.8
+# SVG gốc được vẽ ở tỉ lệ 2x -> scale 0.5 để khớp kích thước thiết kế (30x38 px)
+const SPRITE_SCALE: Vector2 = Vector2(0.5, 0.5)
+
+# Tham chiếu node hiển thị (khai báo sẵn trong troop.tscn, không tạo runtime)
+@onready var body_sprite: AnimatedSprite2D = $Sprite
+@onready var parachute_sprite: Sprite2D = $Parachute
+@onready var scarf_line: Line2D = $Scarf
+@onready var trail_line: Line2D = $Trail
 
 # Biến trạng thái
 var fall_time: float = 0.0
@@ -43,6 +51,7 @@ const COYOTE_COLLISION_WINDOW: float = 0.08
 
 func _ready() -> void:
 	z_index = 10
+	_sync_visuals()
 
 func init_troop(drop_pos: Vector2, target_ground_y: float) -> void:
 	position = drop_pos
@@ -60,7 +69,7 @@ func init_troop(drop_pos: Vector2, target_ground_y: float) -> void:
 	zone_gravity_multiplier = 1.0
 	zone_tilt_multiplier = 1.0
 	zone_horizontal_push = 0.0
-	queue_redraw()
+	_sync_visuals()
 
 func start_drop() -> void:
 	is_active = true
@@ -151,8 +160,8 @@ func _physics_process(delta: float) -> void:
 	if position.y >= ground_y:
 		position.y = ground_y
 		_trigger_landing()
-		
-	queue_redraw()
+
+	_sync_visuals()
 
 func _trigger_landing() -> void:
 	has_landed = true
@@ -177,7 +186,7 @@ func _process_squash(delta: float) -> void:
 	else:
 		squash_stretch = Vector2.ONE
 		is_squashing = false
-	queue_redraw()
+	_sync_visuals()
 
 func on_obstacle_entered(obstacle: Node2D) -> void:
 	overlapping_obstacle = obstacle
@@ -188,70 +197,25 @@ func on_obstacle_exited(obstacle: Node2D) -> void:
 		overlapping_obstacle = null
 		obstacle_overlap_timer = 0.0
 
-func _draw() -> void:
-	# 1. Vẽ vệt quỹ đạo (Trail)
-	if trail_points.size() > 1:
-		for i in range(1, trail_points.size()):
-			var local_p1: Vector2 = trail_points[i - 1] - position
-			var local_p2: Vector2 = trail_points[i] - position
-			var alpha: float = 1.0 - (float(i) / float(trail_points.size()))
-			var col: Color = Color(0.3, 0.8, 1.0, alpha * 0.45)
-			draw_line(local_p1, local_p2, col, max(1.0, 4.0 * (1.0 - float(i)/trail_points.size())))
+func _sync_visuals() -> void:
+	# 1. Vệt quỹ đạo (Trail) - Line2D với gradient mờ dần về đuôi
+	if trail_line != null:
+		var pts: PackedVector2Array = PackedVector2Array()
+		for p in trail_points:
+			pts.append(trail_line.to_local(p))
+		trail_line.points = pts
 
-	# Áp dụng squash stretch
-	draw_set_transform(Vector2.ZERO, 0.0, squash_stretch)
-	
-	# 2. Vẽ Dù lượn nhỏ (Mini Parachute/Glider)
-	if not has_landed:
-		var chute_offset: Vector2 = Vector2(0, -28)
-		# Dây dù
-		draw_line(Vector2(-16, -26), Vector2(0, -10), Color(0.8, 0.8, 0.8, 0.8), 1.5)
-		draw_line(Vector2(16, -26), Vector2(0, -10), Color(0.8, 0.8, 0.8, 0.8), 1.5)
-		draw_line(Vector2(-6, -28), Vector2(0, -10), Color(0.8, 0.8, 0.8, 0.6), 1.2)
-		draw_line(Vector2(6, -28), Vector2(0, -10), Color(0.8, 0.8, 0.8, 0.6), 1.2)
-		
-		# Vòm dù sọc màu nổi bật (Cam - Trắng - Xanh neon)
-		var chute_curve_pts: PackedVector2Array = PackedVector2Array([
-			Vector2(-22, -26),
-			Vector2(-14, -40),
-			Vector2(0, -44),
-			Vector2(14, -40),
-			Vector2(22, -26),
-			Vector2(0, -24)
-		])
-		draw_colored_polygon(chute_curve_pts, Color(1.0, 0.45, 0.15, 0.95))
-		
-		# Sọc giữa màu trắng
-		var mid_stripe: PackedVector2Array = PackedVector2Array([
-			Vector2(-7, -26),
-			Vector2(-5, -42),
-			Vector2(5, -42),
-			Vector2(7, -26),
-			Vector2(0, -24)
-		])
-		draw_colored_polygon(mid_stripe, Color(1.0, 1.0, 1.0, 0.95))
-		
-	# 3. Khăn quàng bay theo gió (Wind Scarf)
-	var scarf_tip: Vector2 = Vector2(sin(scarf_angle) * 16.0, 8.0 + cos(scarf_angle) * 4.0)
-	draw_line(Vector2(0, -6), scarf_tip, Color(1.0, 0.85, 0.2, 0.9), 3.0)
-	
-	# 4. Thân nhân vật (Jumper Body)
-	# Ba lô dù
-	draw_rect(Rect2(-8, -12, 16, 14), Color(0.2, 0.35, 0.55), true)
-	
-	# Thân áo
-	draw_circle(Vector2(0, 0), 10.0, Color(0.25, 0.65, 1.0))
-	
-	# Đầu & Mũ bảo hiểm (Helmet)
-	draw_circle(Vector2(0, -12), 7.5, Color(1.0, 0.8, 0.2))
-	# Kính bảo hộ (Goggles)
-	draw_rect(Rect2(-5, -14, 10, 4), Color(0.1, 0.1, 0.1), true)
-	draw_rect(Rect2(-4, -13, 3, 2), Color(0.4, 0.9, 1.0), true)
-	draw_rect(Rect2(1, -13, 3, 2), Color(0.4, 0.9, 1.0), true)
-	
-	# Chân nhân vật
-	draw_circle(Vector2(-4, 10), 3.5, Color(0.15, 0.2, 0.3))
-	draw_circle(Vector2(4, 10), 3.5, Color(0.15, 0.2, 0.3))
-	
-	# Reset transform
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	# 2. Khăn quàng bay theo gió (Wind Scarf)
+	if scarf_line != null:
+		var scarf_tip: Vector2 = Vector2(sin(scarf_angle) * 16.0, 8.0 + cos(scarf_angle) * 4.0)
+		scarf_line.points = PackedVector2Array([Vector2.ZERO, scarf_tip])
+		scarf_line.scale = squash_stretch
+
+	# 3. Dù lượn: chỉ hiện khi chưa tiếp đất
+	if parachute_sprite != null:
+		parachute_sprite.visible = not has_landed
+		parachute_sprite.scale = SPRITE_SCALE * squash_stretch
+
+	# 4. Thân nhân vật: áp dụng hiệu ứng nén / giãn khi tiếp đất
+	if body_sprite != null:
+		body_sprite.scale = SPRITE_SCALE * squash_stretch

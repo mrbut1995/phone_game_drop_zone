@@ -1,0 +1,51 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/level/Level.tscn" id="1_level"]
+[ext_resource type="Script" path="res://scripts/nodes/game/level/obstacle_spawn.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/turbulence_zone.tscn" id="3_turb"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/thin_air_zone.tscn" id="4_thin"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/ufo.tscn" id="5_ufo"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/rocket.tscn" id="6_rocket"]
+
+[node name="Level6" unique_id=242200477 instance=ExtResource("1_level")]
+level_number = 6
+level_name = "Màn 6: Bão Xoáy & Bí Ẩn Không Gian"
+total_troops = 5
+target_score = 400
+base_wind_min = -180.0
+base_wind_max = 180.0
+gust_interval = 3.2
+target_moving = true
+target_speed = 2.0
+target_move_range = 140.0
+
+[node name="Background" parent="." index="0"]
+modulate = Color(0.75, 0.78, 0.9, 1)
+
+[node name="TurbulenceSpawn" type="Node2D" parent="SpawnObstacles" index="0"]
+position = Vector2(270, 300)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("3_turb")
+extra_params = {
+"multiplier": 0.45
+}
+
+[node name="ThinAirSpawn" type="Node2D" parent="SpawnObstacles" index="1"]
+position = Vector2(270, 520)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("4_thin")
+extra_params = {
+"multiplier": 1.5
+}
+
+[node name="UfoSpawn" type="Node2D" parent="SpawnObstacles" index="2"]
+position = Vector2(600, 620)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("5_ufo")
+direction = -1.0
+speed = 120.0
+
+[node name="RocketSpawn" type="Node2D" parent="SpawnObstacles" index="3"]
+position = Vector2(300, 700)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("6_rocket")

@@ -42,7 +42,7 @@ var landing_history: Array[Dictionary] = []
 var high_score: int = 0
 var countdown_time_left: float = 3.0
 
-func reset_for_new_game(mode: GameMode, level: LevelData = null) -> void:
+func reset_for_new_game(mode: GameMode, level: BaseLevel = null) -> void:
 	game_mode = mode
 	current_score = 0
 	combo_count = 0

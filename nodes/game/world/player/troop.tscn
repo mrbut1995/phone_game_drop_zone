@@ -1,17 +1,51 @@
-[gd_scene format=3 uid="uid://dvxfboso8aymw"]
+[gd_scene load_steps=6 format=3 uid="uid://dvxfboso8aymw"]
 
 [ext_resource type="PackedScene" uid="uid://b18gcgc0mishy" path="res://nodes/game/world/world_actor.tscn" id="1_me1h0"]
 [ext_resource type="Script" uid="uid://mx34j6w7ubty" path="res://scripts/nodes/game/world/troop.gd" id="2_4pukw"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/troop_frames.tres" id="3_troopf"]
+[ext_resource type="Texture2D" uid="uid://bf2lii6w48rmx" path="res://assets/images/placeholder/parachute.svg" id="4_chute"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_troop"]
 radius = 5.0
 
-[node name="WorldActor" unique_id=849325145 instance=ExtResource("1_me1h0")]
+[sub_resource type="Gradient" id="Gradient_trail"]
+offsets = PackedFloat32Array(0, 1)
+colors = PackedColorArray(0.3, 0.8, 1, 0.45, 0.3, 0.8, 1, 0)
+
+[node name="Troop" unique_id=849325145 instance=ExtResource("1_me1h0")]
 collision_layer = 1
 collision_mask = 2
 monitoring = true
 monitorable = false
 script = ExtResource("2_4pukw")
 
+[node name="Sprite" parent="." index="0"]
+centered = false
+offset = Vector2(-30, -44)
+scale = Vector2(0.5, 0.5)
+sprite_frames = ExtResource("3_troopf")
+animation = &"idle"
+autoplay = "idle"
+
 [node name="Collision" parent="." index="1"]
 shape = SubResource("CircleShape2D_troop")
+
+[node name="Trail" type="Line2D" parent="." index="2"]
+z_index = -2
+width = 4.0
+gradient = SubResource("Gradient_trail")
+antialiased = true
+
+[node name="Parachute" type="Sprite2D" parent="." index="3"]
+z_index = -1
+texture = ExtResource("4_chute")
+centered = false
+offset = Vector2(-56, -96)
+scale = Vector2(0.5, 0.5)
+
+[node name="Scarf" type="Line2D" parent="." index="4"]
+z_index = -1
+position = Vector2(0, -6)
+width = 3.0
+default_color = Color(1, 0.85, 0.2, 0.9)
+antialiased = true

@@ -45,10 +45,10 @@ var debug_visible: bool = false
 # Cập nhật HUD (được gọi từ GameLogicController)
 # =============================================================
 
-func update_mode_and_level(mode: GameState.GameMode, level_data: LevelData) -> void:
+func update_mode_and_level(mode: GameState.GameMode, level: BaseLevel) -> void:
 	match mode:
 		GameState.GameMode.CAMPAIGN:
-			lbl_mode_level.text = "%s" % (level_data.level_name if level_data else "CHIẾN DỊCH")
+			lbl_mode_level.text = "%s" % (level.level_name if level else "CHIẾN DỊCH")
 		GameState.GameMode.ENDLESS:
 			lbl_mode_level.text = "CHẾ ĐỘ VÔ TẬN (ENDLESS)"
 		GameState.GameMode.PRACTICE:

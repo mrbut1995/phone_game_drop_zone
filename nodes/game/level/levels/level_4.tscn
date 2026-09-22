@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/level/Level.tscn" id="1_level"]
+[ext_resource type="Script" path="res://scripts/nodes/game/level/obstacle_spawn.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/bird_flock.tscn" id="3_flock"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/balloon.tscn" id="4_balloon"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/ufo.tscn" id="5_ufo"]
+
+[node name="Level4" unique_id=242200477 instance=ExtResource("1_level")]
+level_number = 4
+level_name = "Màn 4: Không Phận Phức Tạp"
+total_troops = 5
+target_score = 360
+base_wind_min = -140.0
+base_wind_max = 140.0
+gust_interval = 4.0
+target_moving = true
+target_speed = 1.6
+target_move_range = 120.0
+
+[node name="Background" parent="." index="0"]
+modulate = Color(0.93, 0.9, 1, 1)
+
+[node name="BirdFlockSpawn" type="Node2D" parent="SpawnObstacles" index="0"]
+position = Vector2(-60, 300)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("3_flock")
+direction = 1.0
+speed = 95.0
+
+[node name="BalloonSpawn" type="Node2D" parent="SpawnObstacles" index="1"]
+position = Vector2(-30, 460)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("4_balloon")
+direction = 1.0
+speed = 42.0
+
+[node name="UfoSpawn" type="Node2D" parent="SpawnObstacles" index="2"]
+position = Vector2(600, 620)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("5_ufo")
+direction = -1.0
+speed = 115.0

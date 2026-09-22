@@ -1,10 +1,17 @@
-[gd_scene format=3 uid="uid://cx61k8w1q3m2y"]
+[gd_scene load_steps=4 format=3 uid="uid://cx61k8w1q3m2y"]
 
-[ext_resource type="Script" uid="uid://ckdmty1bhhgyj" path="res://scripts/nodes/game/world/target_zone.gd" id="1_4d1s7"]
+[ext_resource type="PackedScene" uid="uid://b18gcgc0mishy" path="res://nodes/game/world/world_actor.tscn" id="1_me1h0"]
+[ext_resource type="Script" uid="uid://ckdmty1bhhgyj" path="res://scripts/nodes/game/world/target_zone.gd" id="2_tzone"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/target_zone_frames.tres" id="3_tzf"]
 
-[node name="TargetZone" type="Area2D" unique_id=800325431]
+[node name="TargetZone" unique_id=849325145 instance=ExtResource("1_me1h0")]
 collision_layer = 0
 collision_mask = 0
 monitoring = false
 monitorable = false
-script = ExtResource("1_4d1s7")
+script = ExtResource("2_tzone")
+
+[node name="Sprite" parent="." index="0"]
+sprite_frames = ExtResource("3_tzf")
+animation = &"pulse"
+autoplay = "pulse"

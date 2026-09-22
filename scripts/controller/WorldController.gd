@@ -11,9 +11,12 @@ signal troop_hit_obstacle(obstacle: Node2D)
 
 var active_troop: Troop = null
 var target_zone: TargetZone = null
+var current_level: BaseLevel = null
 
 const DROP_START_POS: Vector2 = Vector2(270.0, 90.0)
-const GROUND_Y: float = 840.0
+const DEFAULT_GROUND_Y: float = 840.0
+# Cao độ mặt đất thực tế của màn đang chơi (lấy từ BaseLevel.ground_y)
+var ground_y: float = DEFAULT_GROUND_Y
 
 func _ready() -> void:
 	_ensure_world_elements()
@@ -36,29 +39,37 @@ func _ensure_world_elements() -> void:
 	if not active_troop.hit_obstacle.is_connected(_on_troop_hit_obstacle):
 		active_troop.hit_obstacle.connect(_on_troop_hit_obstacle)
 
-func apply_level_config(level_data: LevelData) -> void:
+# Nối với signal "level_loaded" của LevelController trong game.tscn
+func _on_level_loaded(level: BaseLevel) -> void:
+	apply_level(level)
+
+# Thay màn cũ bằng Level scene vừa được instantiate, và áp cấu hình của màn lên bia mục tiêu
+func apply_level(level: BaseLevel) -> void:
+	if level == null or world_node == null:
+		return
+
+	# Gỡ màn cũ (nếu có) và đưa màn mới vào dưới cùng của World
+	if is_instance_valid(current_level):
+		world_node.remove_child(current_level)
+		current_level.queue_free()
+	current_level = level
+	world_node.add_child(level)
+	world_node.move_child(level, 0)
+
+	ground_y = level.ground_y
+
+	# Cấu hình bia mục tiêu theo dữ liệu khai báo trong Level scene.
+	# Obstacle đã được SpawnerController sinh ra theo marker (xem _on_level_loaded bên đó).
 	_ensure_world_elements()
-	
 	if target_zone:
-		target_zone.configure(
-			level_data.target_moving,
-			level_data.target_speed,
-			level_data.target_move_range
-		)
-		
-	# Toàn bộ obstacle được SpawnerController khởi tạo từ scene tương ứng,
-	# không tạo node bằng code trong WorldController nữa.
-	if spawner_controller:
-		spawner_controller.spawn_level_obstacles(level_data)
-	else:
-		push_warning("WorldController: chưa gán spawner_controller nên không thể spawn obstacle")
+		level.configure_target_zone(target_zone)
 
 func prepare_troop_for_drop() -> void:
 	_ensure_world_elements()
 	if active_troop:
 		# Điểm xuất phát hơi ngẫu nhiên nhẹ quanh tâm (240 - 300)
 		var start_x = randf_range(250.0, 290.0)
-		active_troop.init_troop(Vector2(start_x, DROP_START_POS.y), GROUND_Y)
+		active_troop.init_troop(Vector2(start_x, DROP_START_POS.y), ground_y)
 		
 	if camera:
 		camera.position = Vector2(270.0, 480.0)
@@ -78,7 +89,7 @@ func update_troop_forces(tilt_force: float, wind_force: float, delta: float = 0.
 		
 		# Camera bám theo độ cao của nhân vật
 		if camera:
-			var target_cam_y = clamp(active_troop.position.y + 120.0, 480.0, GROUND_Y - 240.0)
+			var target_cam_y = clamp(active_troop.position.y + 120.0, 480.0, ground_y - 240.0)
 			camera.position.y = lerp(camera.position.y, target_cam_y, 0.08)
 
 func _on_troop_landed(pos: Vector2) -> void:

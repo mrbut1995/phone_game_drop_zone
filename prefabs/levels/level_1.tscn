@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://baj34ovlufkg2"]
+
+[ext_resource type="PackedScene" uid="uid://cqdxvmoirajxq" path="res://nodes/game/level/Level.tscn" id="1_elbe6"]
+[ext_resource type="Script" uid="uid://dx0ranp1xsb32" path="res://prefabs/levels/level_1.gd" id="2_yqapx"]
+
+[node name="Level" unique_id=242200477 instance=ExtResource("1_elbe6")]
+script = ExtResource("2_yqapx")

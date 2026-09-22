@@ -15,6 +15,9 @@ var gust_interval: float = 6.0
 var gust_timer: float = 0.0
 var warning_time: float = 0.8 # Cảnh báo trước 0.8s
 var gust_duration: float = 1.6
+# Biên độ lực gió giật (px/s) - cấu hình theo từng màn
+var gust_strength_min: float = 120.0
+var gust_strength_max: float = 240.0
 var is_warning: bool = false
 var is_gusting: bool = false
 var pending_gust_force: float = 0.0
@@ -27,9 +30,11 @@ func _ready() -> void:
 	randomize()
 	set_base_wind(randf_range(-60.0, 60.0))
 
-func configure_wind(min_w: float, max_w: float, interval: float = 6.0) -> void:
+func configure_wind(min_w: float, max_w: float, interval: float = 6.0, gust_min: float = 120.0, gust_max: float = 240.0) -> void:
 	base_wind = randf_range(min_w, max_w)
 	gust_interval = interval
+	gust_strength_min = gust_min
+	gust_strength_max = gust_max
 	gust_timer = 0.0
 	is_warning = false
 	is_gusting = false
@@ -41,7 +46,7 @@ func set_base_wind(val: float) -> void:
 func trigger_manual_gust(force: float = 0.0) -> void:
 	if force == 0.0:
 		var dir: float = 1.0 if randf() > 0.5 else -1.0
-		pending_gust_force = dir * randf_range(160.0, 280.0)
+		pending_gust_force = dir * randf_range(gust_strength_min, gust_strength_max)
 	else:
 		pending_gust_force = force
 		

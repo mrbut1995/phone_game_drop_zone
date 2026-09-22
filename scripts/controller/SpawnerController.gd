@@ -10,21 +10,9 @@ signal zone_effect_applied(zone: Obstacle, effect_name: String)
 
 var active_obstacles: Array[Obstacle] = []
 
-# Danh mục các PackedScene obstacle có sẵn trong game
-const OBSTACLE_SCENES: Dictionary = {
-	"bird": preload("res://nodes/game/world/obstacles/bird.tscn"),
-	"airplane": preload("res://nodes/game/world/obstacles/airplane.tscn"),
-	"bird_flock": preload("res://nodes/game/world/obstacles/bird_flock.tscn"),
-	"balloon": preload("res://nodes/game/world/obstacles/balloon.tscn"),
-	"ufo": preload("res://nodes/game/world/obstacles/ufo.tscn"),
-	"rocket": preload("res://nodes/game/world/obstacles/rocket.tscn"),
-	"fireworks": preload("res://nodes/game/world/obstacles/fireworks.tscn"),
-	"powerline": preload("res://nodes/game/world/obstacles/powerline.tscn"),
-	"crane": preload("res://nodes/game/world/obstacles/crane.tscn"),
-	"updraft_zone": preload("res://nodes/game/world/obstacles/updraft_zone.tscn"),
-	"thin_air_zone": preload("res://nodes/game/world/obstacles/thin_air_zone.tscn"),
-	"turbulence_zone": preload("res://nodes/game/world/obstacles/turbulence_zone.tscn")
-}
+# Danh mục obstacle KHÔNG còn hard-code trong code.
+# Mỗi Level scene tự khai báo các marker ObstacleSpawn (con của node SpawnObstacles),
+# mỗi marker gắn đúng PackedScene + tham số riêng -> xem level_1.tscn ... level_6.tscn.
 
 # Quản lý trạng thái overlap giữa Troop và từng obstacle
 var _overlapping_lethal_obs: Obstacle = null
@@ -36,104 +24,47 @@ func clear_all_obstacles() -> void:
 	active_obstacles.clear()
 	_overlapping_lethal_obs = null
 
-# Tạo một Obstacle cụ thể theo key name và truyền cấu hình
-func spawn_obstacle(type_key: String, params: Dictionary = {}) -> Obstacle:
-	if not OBSTACLE_SCENES.has(type_key):
-		push_warning("SpawnerController: Không tìm thấy loại obstacle: " + type_key)
+# Tạo một Obstacle từ PackedScene (scene nào là do Level scene quyết định) và truyền cấu hình
+func spawn_obstacle(scene: PackedScene, params: Dictionary = {}, parent: Node2D = null) -> Obstacle:
+	if scene == null:
+		push_warning("SpawnerController: chưa gán obstacle_scene cho marker")
 		return null
-		
-	var scene: PackedScene = OBSTACLE_SCENES[type_key]
+
 	var obs: Obstacle = scene.instantiate() as Obstacle
 	if obs == null:
+		push_warning("SpawnerController: scene không phải Obstacle: " + scene.resource_path)
 		return null
-		
-	if world_node:
-		world_node.add_child(obs)
-	else:
-		add_child(obs)
-		
+
+	var host: Node = parent
+	if host == null or not host.is_inside_tree():
+		# An toàn: nếu container của level chưa nằm trong tree (thứ tự connection bị đổi)
+		# thì add vào world_node để _ready() của obstacle chạy đúng (các @onready cần node con).
+		host = world_node if (world_node != null and world_node.is_inside_tree()) else self
+	host.add_child(obs)
+
 	obs.setup(params)
 	active_obstacles.append(obs)
 	obstacle_spawned.emit(obs)
 	return obs
 
-# Khởi tạo danh sách obstacle phong phú theo level
-func spawn_level_obstacles(level_data: LevelData) -> void:
+# Nối với signal "level_loaded" của LevelController trong game.tscn
+func _on_level_loaded(level: BaseLevel) -> void:
+	spawn_level_obstacles(level)
+
+# Sinh obstacle theo các marker khai báo sẵn trong Level scene
+func spawn_level_obstacles(level: BaseLevel) -> void:
 	clear_all_obstacles()
-	
-	var count = level_data.obstacle_count
-	if count <= 0:
+	if level == null:
 		return
-		
-	var lvl = level_data.level_number
-	
-	# Màn 2: 1 vật thể di chuyển (Chim hoặc Khinh khí cầu)
-	if lvl == 2:
-		spawn_obstacle("bird", {
-			"speed": 85.0,
-			"direction": 1.0,
-			"y_alt": 450.0
-		})
-		return
-		
-	# Màn 3: 2 vật thể (Chim + Máy bay)
-	if lvl == 3:
-		spawn_obstacle("bird", {
-			"speed": 80.0,
-			"direction": 1.0,
-			"y_alt": 360.0
-		})
-		spawn_obstacle("airplane", {
-			"speed": 135.0,
-			"direction": -1.0,
-			"y_alt": 540.0
-		})
-		return
-		
-	# Màn 4 trở lên: Phối hợp đa dạng các nhóm vật thể và vùng đặc biệt
-	var types_pool: Array[String] = [
-		"bird", "airplane", "bird_flock", "balloon", "ufo",
-		"powerline", "crane", "updraft_zone", "turbulence_zone"
-	]
-	
-	var base_y = 280.0
-	var spacing_y = 480.0 / max(1, count)
-	
-	for i in range(count):
-		var selected_type: String = types_pool[i % types_pool.size()]
-		var dir: float = 1.0 if i % 2 == 0 else -1.0
-		var alt_y: float = base_y + float(i) * spacing_y
-		
-		var config: Dictionary = {
-			"direction": dir,
-			"y_alt": alt_y
-		}
-		
-		match selected_type:
-			"bird":
-				config["speed"] = randf_range(70.0, 100.0)
-			"airplane":
-				config["speed"] = randf_range(130.0, 160.0)
-			"bird_flock":
-				config["speed"] = randf_range(80.0, 110.0)
-			"balloon":
-				config["speed"] = randf_range(35.0, 50.0)
-			"ufo":
-				config["speed"] = randf_range(100.0, 130.0)
-			"powerline":
-				config["position"] = Vector2(270.0, alt_y)
-				config["line_width"] = 380.0
-			"crane":
-				config["position"] = Vector2(40.0 if dir > 0 else 500.0, alt_y)
-				config["is_facing_right"] = (dir > 0)
-			"updraft_zone":
-				config["position"] = Vector2(270.0, alt_y)
-				config["lift_force"] = 450.0
-			"turbulence_zone":
-				config["position"] = Vector2(270.0, alt_y)
-				config["multiplier"] = 0.45
-				
-		spawn_obstacle(selected_type, config)
+
+	# Obstacle được add vào container "SpawnObstacles" của level (KHÔNG phải vào marker)
+	# để toạ độ của chúng khớp hệ toạ độ của level.
+	var container: Node2D = level.get_spawn_obstacles_container()
+	for marker in level.get_spawn_markers():
+		if marker.obstacle_scene == null:
+			push_warning("SpawnerController: marker %s chưa gán obstacle_scene" % marker.name)
+			continue
+		spawn_obstacle(marker.obstacle_scene, marker.build_params(), container)
 
 # Kiểm tra tương tác Troop <-> Obstacle mỗi frame.
 # Va chạm do physics đảm nhiệm: Troop (Area2D) khai báo CollisionShape2D + mask layer 2,

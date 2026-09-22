@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/level/Level.tscn" id="1_level"]
+[ext_resource type="Script" path="res://scripts/nodes/game/level/obstacle_spawn.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/bird.tscn" id="3_bird"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/airplane.tscn" id="4_plane"]
+
+[node name="Level3" unique_id=242200477 instance=ExtResource("1_level")]
+level_number = 3
+level_name = "Màn 3: Mục Tiêu Di Động"
+total_troops = 5
+target_score = 350
+base_wind_min = -120.0
+base_wind_max = 120.0
+gust_interval = 4.5
+target_moving = true
+target_speed = 1.4
+target_move_range = 100.0
+
+[node name="Background" parent="." index="0"]
+modulate = Color(1, 0.96, 0.88, 1)
+
+[node name="BirdSpawn" type="Node2D" parent="SpawnObstacles" index="0"]
+position = Vector2(-40, 360)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("3_bird")
+direction = 1.0
+speed = 80.0
+
+[node name="AirplaneSpawn" type="Node2D" parent="SpawnObstacles" index="1"]
+position = Vector2(600, 540)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("4_plane")
+direction = -1.0
+speed = 135.0

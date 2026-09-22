@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 260" width="1560" height="260">
+  <defs>
+    <!-- VÒNG 20 ĐIỂM (R = 125px) -->
+    <g id="ring_20">
+      <circle cx="0" cy="0" r="125" fill="#2e3852" fill-opacity="0.75" stroke="#668cbf" stroke-width="2.5" stroke-opacity="0.8" />
+    </g>
+
+    <!-- VÒNG 40 ĐIỂM (R = 85px) -->
+    <g id="ring_40">
+      <circle cx="0" cy="0" r="85" fill="#2673bf" fill-opacity="0.85" stroke="#99d9ff" stroke-width="2" stroke-opacity="0.9" />
+    </g>
+
+    <!-- VÒNG 70 ĐIỂM (R = 50px) -->
+    <g id="ring_70">
+      <circle cx="0" cy="0" r="50" fill="#e6b326" fill-opacity="0.9" stroke="#fff299" stroke-width="2" />
+    </g>
+
+    <!-- CROSSHAIR TRUNG TÂM -->
+    <g id="crosshair" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.95">
+      <line x1="-7" y1="0" x2="7" y2="0" />
+      <line x1="0" y1="-7" x2="0" y2="7" />
+      <circle cx="0" cy="0" r="3" fill="#ffffff" stroke="none" />
+    </g>
+
+    <!-- CỌC CỜ TIÊU ĐIỂM (MARKER FLAG) -->
+    <g id="marker_flag">
+      <line x1="0" y1="0" x2="0" y2="-26" stroke="#e6e6e6" stroke-width="2" stroke-linecap="round" />
+      <polygon points="0,-26 14,-20 0,-14" fill="#ff3333" />
+    </g>
+  </defs>
+
+  <!-- FRAME 0: Nhịp 0 - tâm rực nhẹ -->
+  <g id="frame_0" transform="translate(0, 0)">
+    <g transform="translate(130, 130)">
+      <use href="#ring_20" />
+      <use href="#ring_40" />
+      <use href="#ring_70" />
+      <circle cx="0" cy="0" r="30" fill="#ff7386" fill-opacity="0.05" />
+      <circle cx="0" cy="0" r="22" fill="#f22640" stroke="#ffffff" stroke-width="2" stroke-opacity="0.9" />
+      <use href="#crosshair" />
+      <use href="#marker_flag" />
+    </g>
+  </g>
+
+  <!-- FRAME 1: Nhịp 1 -->
+  <g id="frame_1" transform="translate(260, 0)">
+    <g transform="translate(130, 130)">
+      <use href="#ring_20" />
+      <use href="#ring_40" />
+      <use href="#ring_70" />
+      <circle cx="0" cy="0" r="31" fill="#ff7386" fill-opacity="0.09" />
+      <circle cx="0" cy="0" r="22" fill="#f74159" stroke="#ffffff" stroke-width="2" stroke-opacity="0.9" />
+      <use href="#crosshair" />
+      <use href="#marker_flag" />
+    </g>
+  </g>
+
+  <!-- FRAME 2: Nhịp 2 -->
+  <g id="frame_2" transform="translate(520, 0)">
+    <g transform="translate(130, 130)">
+      <use href="#ring_20" />
+      <use href="#ring_40" />
+      <use href="#ring_70" />
+      <circle cx="0" cy="0" r="33" fill="#ff7386" fill-opacity="0.13" />
+      <circle cx="0" cy="0" r="22" fill="#fb5c71" stroke="#ffffff" stroke-width="2" stroke-opacity="0.9" />
+      <use href="#crosshair" />
+      <use href="#marker_flag" />
+    </g>
+  </g>
+
+  <!-- FRAME 3: Nhịp 3 - đỉnh sáng nhất -->
+  <g id="frame_3" transform="translate(780, 0)">
+    <g transform="translate(130, 130)">
+      <use href="#ring_20" />
+      <use href="#ring_40" />
+      <use href="#ring_70" />
+      <circle cx="0" cy="0" r="35" fill="#ff8c9c" fill-opacity="0.17" />
+      <circle cx="0" cy="0" r="22" fill="#ff7386" stroke="#ffffff" stroke-width="2" stroke-opacity="0.9" />
+      <use href="#crosshair" />
+      <use href="#marker_flag" />
+    </g>
+  </g>
+
+  <!-- FRAME 4: Nhịp 4 (giảm dần) -->
+  <g id="frame_4" transform="translate(1040, 0)">
+    <g transform="translate(130, 130)">
+      <use href="#ring_20" />
+      <use href="#ring_40" />
+      <use href="#ring_70" />
+      <circle cx="0" cy="0" r="33" fill="#ff7386" fill-opacity="0.13" />
+      <circle cx="0" cy="0" r="22" fill="#fb5c71" stroke="#ffffff" stroke-width="2" stroke-opacity="0.9" />
+      <use href="#crosshair" />
+      <use href="#marker_flag" />
+    </g>
+  </g>
+
+  <!-- FRAME 5: Nhịp 5 (chuẩn bị loop về 0) -->
+  <g id="frame_5" transform="translate(1300, 0)">
+    <g transform="translate(130, 130)">
+      <use href="#ring_20" />
+      <use href="#ring_40" />
+      <use href="#ring_70" />
+      <circle cx="0" cy="0" r="31" fill="#ff7386" fill-opacity="0.09" />
+      <circle cx="0" cy="0" r="22" fill="#f74159" stroke="#ffffff" stroke-width="2" stroke-opacity="0.9" />
+      <use href="#crosshair" />
+      <use href="#marker_flag" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/level/Level.tscn" id="1_level"]
+[ext_resource type="Script" path="res://scripts/nodes/game/level/obstacle_spawn.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/powerline.tscn" id="3_power"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/airplane.tscn" id="4_plane"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/crane.tscn" id="5_crane"]
+
+[node name="Level5" unique_id=242200477 instance=ExtResource("1_level")]
+level_number = 5
+level_name = "Màn 5: Vượt Chướng Ngại Đô Thị"
+total_troops = 5
+target_score = 380
+base_wind_min = -150.0
+base_wind_max = 150.0
+gust_interval = 3.8
+target_moving = true
+target_speed = 1.8
+target_move_range = 130.0
+
+[node name="Background" parent="." index="0"]
+modulate = Color(0.86, 0.86, 0.88, 1)
+
+[node name="PowerlineSpawn" type="Node2D" parent="SpawnObstacles" index="0"]
+position = Vector2(270, 380)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("3_power")
+extra_params = {
+"line_width": 300.0
+}
+
+[node name="AirplaneSpawn" type="Node2D" parent="SpawnObstacles" index="1"]
+position = Vector2(600, 560)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("4_plane")
+direction = -1.0
+speed = 145.0
+
+[node name="CraneFixed" parent="Obstacles" index="0" instance=ExtResource("5_crane")]
+position = Vector2(40, 420)

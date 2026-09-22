@@ -1,7 +1,7 @@
 class_name GameLogicController
 extends Node
 
-signal game_started(mode: GameState.GameMode, level_data: LevelData)
+signal game_started(mode: GameState.GameMode, level: BaseLevel)
 signal countdown_ticked(remaining_sec: int)
 signal drop_started
 signal troop_landed_evaluated(result: Dictionary)
@@ -34,18 +34,29 @@ func _ready() -> void:
 # (tab "Node" -> "Signals" của từng Controller), KHÔNG nối trong code nữa.
 
 func start_game(mode: GameState.GameMode = GameState.GameMode.CAMPAIGN) -> void:
-	var level_data: LevelData = level_ctrl.get_current_level_data()
-	game_state.reset_for_new_game(mode, level_data)
-	
-	# Cấu hình môi trường thế giới và gió
-	world_ctrl.apply_level_config(level_data)
-	wind_ctrl.configure_wind(level_data.base_wind_min, level_data.base_wind_max, level_data.gust_interval)
-	
-	ui_ctrl.update_mode_and_level(mode, level_data)
+	# LevelController instantiate Level scene -> phát "level_loaded" ->
+	# WorldController dựng màn + cấu hình bia, SpawnerController sinh obstacle theo marker trong scene.
+	var level: BaseLevel = level_ctrl.load_current_level()
+	if level == null:
+		push_error("GameLogicController: không load được màn chơi")
+		return
+
+	game_state.reset_for_new_game(mode, level)
+
+	# Cấu hình gió theo dữ liệu khai báo trong màn (kèm biên độ gió giật riêng)
+	wind_ctrl.configure_wind(
+		level.base_wind_min,
+		level.base_wind_max,
+		level.gust_interval,
+		level.gust_strength_min,
+		level.gust_strength_max
+	)
+
+	ui_ctrl.update_mode_and_level(mode, level)
 	ui_ctrl.update_score(game_state.current_score, game_state.target_score, game_state.combo_multiplier)
 	ui_ctrl.update_troop_count(game_state.current_troop_index, game_state.total_troops)
 	
-	game_started.emit(mode, level_data)
+	game_started.emit(mode, level)
 	start_troop_round()
 
 func start_troop_round() -> void:
@@ -79,7 +90,7 @@ func _process(delta: float) -> void:
 		var troop = world_ctrl.active_troop
 		if troop and troop.is_active:
 			# Áp dụng lực tilt và gió (kèm delta để kiểm tra tương tác obstacle & special zones)
-			var wind_at_alt = wind_ctrl.get_wind_at_altitude(troop.position.y, world_ctrl.GROUND_Y)
+			var wind_at_alt = wind_ctrl.get_wind_at_altitude(troop.position.y, world_ctrl.ground_y)
 			world_ctrl.update_troop_forces(input_ctrl.tilt_force, wind_at_alt, delta)
 			
 			# Cập nhật Telemetry
@@ -231,6 +242,7 @@ func restart_current_level() -> void:
 	start_game(game_state.game_mode)
 
 func advance_to_next_level() -> void:
+	# next_level() chỉ đổi chỉ số màn; start_game() sẽ load Level scene tương ứng của màn mới
 	level_ctrl.next_level()
 	start_game(GameState.GameMode.CAMPAIGN)
 
