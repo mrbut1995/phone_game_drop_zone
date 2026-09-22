@@ -189,7 +189,11 @@ func _on_world_troop_hit_obstacle(obs: Node2D) -> void:
 	var troop = world_ctrl.active_troop
 	var hit_pos = troop.position if troop else Vector2(270, 500)
 	if troop:
-		troop.is_active = false
+		# Lính bị hạ gục: chớp đỏ, xoay tròn và rơi tiếp xuống đất (không đứng im giữa không trung)
+		troop.apply_knockout()
+
+	# Phản hồi va chạm: hiệu ứng nổ tại điểm chạm + rung camera
+	world_ctrl.play_hit_feedback(hit_pos)
 		
 	# Tính 0 điểm lượt này và reset combo
 	var final_points = game_state.add_landing_score(0, 999.0, "VA CHẠM VẬT CẢN!")
@@ -205,7 +209,7 @@ func _on_world_troop_hit_obstacle(obs: Node2D) -> void:
 	world_ctrl.spawn_floating_score(fail_eval, hit_pos)
 	
 	if sfx_ctrl:
-		sfx_ctrl.play_miss()
+		sfx_ctrl.play_hit_impact()
 		
 	ui_ctrl.update_score(game_state.current_score, game_state.target_score, game_state.combo_multiplier)
 	troop_landed_evaluated.emit(fail_eval)

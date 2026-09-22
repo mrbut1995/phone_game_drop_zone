@@ -1,3 +1,10 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# APK build output (android_export_setup.bat)
+/builds/
+
+# Exported Android binaries — không commit (APK vượt giới hạn 100MB của GitHub)
+*.apk
+*.idsig

@@ -44,10 +44,13 @@ var squash_stretch: Vector2 = Vector2.ONE
 var is_squashing: bool = false
 var squash_timer: float = 0.0
 
-# Coyote time cho chướng ngại vật
-var obstacle_overlap_timer: float = 0.0
+# Va chạm chướng ngại vật (tính NGAY khi overlap, không có thời gian trễ)
 var overlapping_obstacle: Node2D = null
-const COYOTE_COLLISION_WINDOW: float = 0.08
+
+# Trạng thái bị hạ gục sau va chạm: rơi tự do + xoay tròn (không nhận input nữa)
+var is_knocked_out: bool = false
+var knockout_spin: float = 0.0
+const KNOCKOUT_GRAVITY_SCALE: float = 0.85
 
 func _ready() -> void:
 	z_index = 10
@@ -69,6 +72,12 @@ func init_troop(drop_pos: Vector2, target_ground_y: float) -> void:
 	zone_gravity_multiplier = 1.0
 	zone_tilt_multiplier = 1.0
 	zone_horizontal_push = 0.0
+	is_knocked_out = false
+	knockout_spin = 0.0
+	overlapping_obstacle = null
+	if body_sprite != null:
+		body_sprite.rotation = 0.0
+		body_sprite.modulate = Color.WHITE
 	_sync_visuals()
 
 func start_drop() -> void:
@@ -93,6 +102,11 @@ func apply_horizontal_push(push_f: float, _delta: float) -> void:
 	zone_horizontal_push += push_f
 
 func _physics_process(delta: float) -> void:
+	# Bị hạ gục: rơi tự do + xoay tròn tới khi chạm đất
+	if is_knocked_out:
+		_process_knockout(delta)
+		return
+
 	if not is_active:
 		if is_squashing:
 			_process_squash(delta)
@@ -148,14 +162,7 @@ func _physics_process(delta: float) -> void:
 	# Góc bay của khăn quàng / dù phụ thuộc vào vận tốc ngang và gió
 	var target_scarf: float = clamp((-velocity.x - current_wind_force * 0.3) * 0.15, -45.0, 45.0)
 	scarf_angle = lerp_angle(scarf_angle, deg_to_rad(target_scarf), delta * 8.0)
-	
-	# Kiểm tra Coyote Collision với obstacle nếu có
-	if overlapping_obstacle != null:
-		obstacle_overlap_timer += delta
-		if obstacle_overlap_timer >= COYOTE_COLLISION_WINDOW:
-			hit_obstacle.emit(overlapping_obstacle)
-			overlapping_obstacle = null
-			
+
 	# Kiểm tra chạm đất
 	if position.y >= ground_y:
 		position.y = ground_y
@@ -189,13 +196,62 @@ func _process_squash(delta: float) -> void:
 	_sync_visuals()
 
 func on_obstacle_entered(obstacle: Node2D) -> void:
+	# Va chạm được tính NGAY lập tức. Trước đây có cửa sổ trễ 0.08s (coyote) nên obstacle
+	# nhỏ (chim r=12) bị xuyên qua mà không kích hoạt gì.
+	if has_landed or is_knocked_out:
+		return
 	overlapping_obstacle = obstacle
-	obstacle_overlap_timer = 0.0
+	hit_obstacle.emit(obstacle)
+	overlapping_obstacle = null
 
 func on_obstacle_exited(obstacle: Node2D) -> void:
 	if overlapping_obstacle == obstacle:
 		overlapping_obstacle = null
-		obstacle_overlap_timer = 0.0
+
+# Bị chướng ngại vật hạ gục: ngừng nhận input, rơi tiếp và xoay tròn cho tới khi chạm đất
+func apply_knockout() -> void:
+	if is_knocked_out or has_landed:
+		return
+	is_knocked_out = true
+	is_active = false
+	current_tilt_force = 0.0
+	current_wind_force = 0.0
+	velocity.x *= 0.35
+	knockout_spin = (1.0 if velocity.x >= 0.0 else -1.0) * randf_range(7.0, 11.0)
+	_flash_hit()
+	_sync_visuals()
+
+func _process_knockout(delta: float) -> void:
+	velocity.y = minf(velocity.y + GRAVITY * KNOCKOUT_GRAVITY_SCALE * delta, MAX_FALL_SPEED * 1.1)
+	velocity.x = move_toward(velocity.x, 0.0, 140.0 * delta)
+	position += velocity * delta
+	position.x = clampf(position.x, 25.0, 515.0)
+
+	# Vệt quỹ đạo vẫn được vẽ để thấy đường rơi
+	trail_points.push_front(position)
+	if trail_points.size() > max_trail_points:
+		trail_points.pop_back()
+
+	if body_sprite != null:
+		body_sprite.rotation += knockout_spin * delta
+
+	if position.y >= ground_y:
+		position.y = ground_y
+		has_landed = true
+		is_knocked_out = false
+
+	_sync_visuals()
+
+# Chớp đỏ khi trúng đòn (phản hồi trực quan rõ ràng)
+func _flash_hit() -> void:
+	if body_sprite != null:
+		var tw := create_tween()
+		tw.tween_property(body_sprite, "modulate", Color(1.0, 0.35, 0.3), 0.06)
+		tw.tween_property(body_sprite, "modulate", Color.WHITE, 0.4)
+	if parachute_sprite != null and parachute_sprite.visible:
+		var tw2 := create_tween()
+		tw2.tween_property(parachute_sprite, "modulate", Color(1.0, 0.4, 0.3), 0.06)
+		tw2.tween_property(parachute_sprite, "modulate", Color.WHITE, 0.4)
 
 func _sync_visuals() -> void:
 	# 1. Vệt quỹ đạo (Trail) - Line2D với gradient mờ dần về đuôi
@@ -211,9 +267,9 @@ func _sync_visuals() -> void:
 		scarf_line.points = PackedVector2Array([Vector2.ZERO, scarf_tip])
 		scarf_line.scale = squash_stretch
 
-	# 3. Dù lượn: chỉ hiện khi chưa tiếp đất
+	# 3. Dù lượn: chỉ hiện khi đang thả dù (chưa tiếp đất và chưa bị hạ gục)
 	if parachute_sprite != null:
-		parachute_sprite.visible = not has_landed
+		parachute_sprite.visible = not has_landed and not is_knocked_out
 		parachute_sprite.scale = SPRITE_SCALE * squash_stretch
 
 	# 4. Thân nhân vật: áp dụng hiệu ứng nén / giãn khi tiếp đất

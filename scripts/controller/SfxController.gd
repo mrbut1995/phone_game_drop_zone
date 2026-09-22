@@ -1,6 +1,24 @@
 class_name SfxController
 extends Node
 
+# ============================================================
+# SFX placeholder: các file .wav trong "assets/sfx/" (đã sinh sẵn, nghe được ngay).
+# Muốn đổi sang âm thanh thật: kéo file mới vào từng ô export dưới đây trong
+# Inspector của node SfxController, hoặc thay trực tiếp file .wav cùng tên.
+# KHÔNG còn sinh tone bằng code lúc chạy.
+# ============================================================
+@export var sfx_countdown_tick: AudioStream = preload("res://assets/sfx/countdown_tick.wav")
+@export var sfx_countdown_go: AudioStream = preload("res://assets/sfx/countdown_go.wav")
+@export var sfx_drop_swoosh: AudioStream = preload("res://assets/sfx/drop_swoosh.wav")
+@export var sfx_bullseye: AudioStream = preload("res://assets/sfx/bullseye.wav")
+@export var sfx_good_landing: AudioStream = preload("res://assets/sfx/good_landing.wav")
+@export var sfx_miss: AudioStream = preload("res://assets/sfx/miss.wav")
+@export var sfx_gust_alert: AudioStream = preload("res://assets/sfx/gust_alert.wav")
+@export var sfx_hit_impact: AudioStream = preload("res://assets/sfx/hit_impact.wav")
+
+# Biến thiên pitch nhẹ để tiếng lặp lại (countdown, miss) không bị khô
+@export var pitch_variation: float = 0.04
+
 # Bộ phát âm thanh: 6 AudioStreamPlayer (Player1..Player6) được khai báo sẵn trong scene base.tscn
 var player_pool: Array[AudioStreamPlayer] = []
 
@@ -18,65 +36,37 @@ func _get_available_player() -> AudioStreamPlayer:
 			return p
 	return player_pool[0]
 
-# Tạo âm thanh sin đơn giản (Sine wave beep) theo tần số và thời lượng
-func _create_tone_stream(freq: float, duration: float, decay: bool = true) -> AudioStreamWAV:
-	var sample_rate: int = 22050
-	var total_samples: int = int(sample_rate * duration)
-	var byte_data = PackedByteArray()
-	byte_data.resize(total_samples)
-	
-	for i in range(total_samples):
-		var t: float = float(i) / float(sample_rate)
-		var env: float = 1.0
-		if decay:
-			env = max(0.0, 1.0 - (float(i) / float(total_samples)))
-		var val: float = sin(t * freq * TAU) * env * 0.4
-		var byte_val: int = int(clamp((val + 1.0) * 0.5 * 255.0, 0, 255))
-		byte_data[i] = byte_val
-		
-	var stream = AudioStreamWAV.new()
-	stream.format = AudioStreamWAV.FORMAT_8_BITS
-	stream.mix_rate = sample_rate
-	stream.data = byte_data
-	return stream
+# Phát một AudioStream qua pool, kèm biến thiên pitch nhẹ nếu cần
+func play_sfx(stream: AudioStream, volume_db: float = 0.0, pitch_jitter: bool = false) -> void:
+	if stream == null or player_pool.is_empty():
+		return
+	var p := _get_available_player()
+	p.stream = stream
+	p.volume_db = volume_db
+	p.pitch_scale = 1.0 + (randf_range(-pitch_variation, pitch_variation) if pitch_jitter else 0.0)
+	p.play()
+
+# ============================================================
+# API tiện dụng cho GameLogicController
+# ============================================================
 
 func play_countdown_tick(is_final: bool = false) -> void:
-	var player = _get_available_player()
-	var freq: float = 880.0 if is_final else 520.0
-	var dur: float = 0.22 if is_final else 0.12
-	player.stream = _create_tone_stream(freq, dur)
-	player.play()
+	play_sfx(sfx_countdown_go if is_final else sfx_countdown_tick, 0.0, true)
 
 func play_drop_swoosh() -> void:
-	var player = _get_available_player()
-	player.stream = _create_tone_stream(280.0, 0.35)
-	player.play()
+	play_sfx(sfx_drop_swoosh)
 
 func play_bullseye() -> void:
-	# Hợp âm chiến thắng (Chime)
-	var player = _get_available_player()
-	player.stream = _create_tone_stream(1046.5, 0.45) # Note C6
-	player.play()
-	
-	var tw = create_tween()
-	tw.tween_interval(0.1)
-	tw.tween_callback(func():
-		var p2 = _get_available_player()
-		p2.stream = _create_tone_stream(1318.5, 0.5) # Note E6
-		p2.play()
-	)
+	play_sfx(sfx_bullseye)
 
 func play_good_landing() -> void:
-	var player = _get_available_player()
-	player.stream = _create_tone_stream(659.25, 0.3)
-	player.play()
+	play_sfx(sfx_good_landing)
 
 func play_miss() -> void:
-	var player = _get_available_player()
-	player.stream = _create_tone_stream(140.0, 0.4)
-	player.play()
+	play_sfx(sfx_miss, 0.0, true)
 
 func play_gust_alert() -> void:
-	var player = _get_available_player()
-	player.stream = _create_tone_stream(330.0, 0.2)
-	player.play()
+	play_sfx(sfx_gust_alert, 1.0)
+
+func play_hit_impact() -> void:
+	play_sfx(sfx_hit_impact, 1.0, true)

@@ -102,9 +102,10 @@ func check_troop_interactions(troop: Troop, delta: float) -> void:
 			has_any_lethal_overlap = true
 			if _overlapping_lethal_obs != obs:
 				_overlapping_lethal_obs = obs
+				# Troop phát signal va chạm NGAY khi overlap (không chờ đệm)
 				troop.on_obstacle_entered(obs)
 				
-	# Nếu không còn chạm vật cản lethal nào nữa -> Báo exited để reset Coyote Time
+	# Không còn chạm vật cản lethal nào nữa -> báo exited để reset trạng thái theo dõi
 	if not has_any_lethal_overlap and _overlapping_lethal_obs != null:
 		troop.on_obstacle_exited(_overlapping_lethal_obs)
 		_overlapping_lethal_obs = null

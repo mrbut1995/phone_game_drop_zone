@@ -9,6 +9,9 @@ signal troop_hit_obstacle(obstacle: Node2D)
 @export var camera: Camera2D
 @export var spawner_controller: SpawnerController
 
+# Scene hiệu ứng nổ khi va chạm - đổi được trong Inspector nếu muốn art khác
+@export var hit_effect_scene: PackedScene = preload("res://nodes/game/world/fx/hit_effect.tscn")
+
 var active_troop: Troop = null
 var target_zone: TargetZone = null
 var current_level: BaseLevel = null
@@ -73,6 +76,7 @@ func prepare_troop_for_drop() -> void:
 		
 	if camera:
 		camera.position = Vector2(270.0, 480.0)
+		camera.offset = Vector2.ZERO
 		camera.zoom = Vector2.ONE
 
 func release_troop() -> void:
@@ -104,6 +108,32 @@ func _on_troop_landed(pos: Vector2) -> void:
 
 func _on_troop_hit_obstacle(obs: Node2D) -> void:
 	troop_hit_obstacle.emit(obs)
+
+# Phản hồi khi lính đụng chướng ngại vật: hiệu ứng nổ + rung camera
+func play_hit_feedback(hit_pos: Vector2) -> void:
+	if world_node == null:
+		return
+
+	# Hiệu ứng nổ tại điểm va chạm (scene khai báo sẵn, tự huỷ khi hết animation)
+	if hit_effect_scene != null:
+		var fx := hit_effect_scene.instantiate() as HitEffect
+		if fx != null:
+			world_node.add_child(fx)
+			fx.play_at(hit_pos)
+
+	_shake_camera()
+
+# Rung camera ngắn khi va chạm (giảm dần biên độ)
+func _shake_camera(duration: float = 0.32, magnitude: float = 14.0) -> void:
+	if camera == null:
+		return
+	var steps: int = max(2, int(duration / 0.04))
+	var tw := create_tween()
+	for i in steps:
+		var falloff: float = 1.0 - float(i) / float(steps)
+		var offset := Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * magnitude * falloff
+		tw.tween_property(camera, "offset", offset, 0.04)
+	tw.tween_property(camera, "offset", Vector2.ZERO, 0.05)
 
 # Hiệu ứng nổi chữ điểm số (Floating text) tại vị trí đáp
 func spawn_floating_score(score_info: Dictionary, land_pos: Vector2) -> void:

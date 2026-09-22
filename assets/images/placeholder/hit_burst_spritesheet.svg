@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 96" width="576" height="96">
+  <!-- HIT BURST placeholder - 6 frame 96x96: chớp sáng -> vòng lan rộng -> tàn -->
+  <!-- Frame 0: chớp sáng -->
+  <g transform="translate(48,48)">
+    <circle r="6" fill="#fffbe6" />
+    <g stroke="#ffd24d" stroke-width="3" stroke-linecap="round" stroke-opacity="0.95">
+      <line y1="-8" y2="-14" /><line y1="8" y2="14" /><line x1="-8" x2="-14" /><line x1="8" x2="14" />
+    </g>
+  </g>
+
+  <!-- Frame 1 -->
+  <g transform="translate(96,0) translate(48,48)">
+    <circle r="9" fill="#fff3b0" fill-opacity="0.9" />
+    <circle r="14" fill="none" stroke="#ffc93c" stroke-width="4" stroke-opacity="0.95" />
+    <g stroke="#ffd24d" stroke-width="3.5" stroke-linecap="round" stroke-opacity="0.9">
+      <line y1="-17" y2="-27" /><line y1="17" y2="27" /><line x1="-17" x2="-27" /><line x1="17" x2="27" />
+      <g transform="rotate(45)"><line y1="-17" y2="-27" /><line y1="17" y2="27" /><line x1="-17" x2="-27" /><line x1="17" x2="27" /></g>
+    </g>
+  </g>
+
+  <!-- Frame 2 -->
+  <g transform="translate(192,0) translate(48,48)">
+    <circle r="5" fill="#fff3b0" fill-opacity="0.65" />
+    <circle r="21" fill="none" stroke="#ffb300" stroke-width="4" stroke-opacity="0.8" />
+    <g stroke="#ffbe33" stroke-width="3.5" stroke-linecap="round" stroke-opacity="0.7">
+      <line y1="-24" y2="-35" /><line y1="24" y2="35" /><line x1="-24" x2="-35" /><line x1="24" x2="35" />
+      <g transform="rotate(45)"><line y1="-24" y2="-35" /><line y1="24" y2="35" /><line x1="-24" x2="-35" /><line x1="24" x2="35" /></g>
+    </g>
+    <g fill="#ffd24d" fill-opacity="0.9">
+      <circle cx="16" cy="12" r="2" /><circle cx="-18" cy="-9" r="2" />
+      <circle cx="-10" cy="19" r="2" /><circle cx="21" cy="-14" r="2" />
+    </g>
+  </g>
+
+  <!-- Frame 3 -->
+  <g transform="translate(288,0) translate(48,48)">
+    <circle r="29" fill="none" stroke="#ff8a1a" stroke-width="3.5" stroke-opacity="0.6" />
+    <g stroke="#ff9a2e" stroke-width="3" stroke-linecap="round" stroke-opacity="0.45">
+      <line y1="-31" y2="-41" /><line y1="31" y2="41" /><line x1="-31" x2="-41" /><line x1="31" x2="41" />
+      <g transform="rotate(45)"><line y1="-31" y2="-41" /><line y1="31" y2="41" /><line x1="-31" x2="-41" /><line x1="31" x2="41" /></g>
+    </g>
+    <g fill="#ffbe33" fill-opacity="0.6">
+      <circle cx="26" cy="-18" r="1.8" /><circle cx="-27" cy="15" r="1.8" /><circle cx="4" cy="30" r="1.8" />
+    </g>
+  </g>
+
+  <!-- Frame 4 -->
+  <g transform="translate(384,0) translate(48,48)">
+    <circle r="36" fill="none" stroke="#ff5a1a" stroke-width="3" stroke-opacity="0.35" />
+    <g stroke="#ff6a26" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.28">
+      <line y1="-38" y2="-46" /><line y1="38" y2="46" /><line x1="-38" x2="-46" /><line x1="38" x2="46" />
+      <g transform="rotate(45)"><line y1="-38" y2="-46" /><line y1="38" y2="46" /><line x1="-38" x2="-46" /><line x1="38" x2="46" /></g>
+    </g>
+  </g>
+
+  <!-- Frame 5 -->
+  <g transform="translate(480,0) translate(48,48)">
+    <circle r="43" fill="none" stroke="#ff4d1a" stroke-width="2" stroke-opacity="0.15" />
+    <g stroke="#ff5a1a" stroke-width="2" stroke-linecap="round" stroke-opacity="0.12">
+      <line y1="-44" y2="-48" /><line y1="44" y2="48" /><line x1="-44" x2="-48" /><line x1="44" x2="48" />
+    </g>
+  </g>
+</svg>
