@@ -10,23 +10,37 @@
 [ext_resource type="Script" uid="uid://dk62uai31vdp0" path="res://scripts/controller/InputController.gd" id="7_u5sy4"]
 [ext_resource type="Script" uid="uid://cq5hrg0vrlfhe" path="res://scripts/controller/LevelController.gd" id="9_0tnpc"]
 [ext_resource type="Script" uid="uid://b87j7571y0ane" path="res://scripts/controller/SpawnerController.gd" id="10_vtaks"]
+[ext_resource type="PackedScene" uid="uid://dvxfboso8aymw" path="res://nodes/game/world/troop.tscn" id="11_rp3kd"]
+[ext_resource type="PackedScene" uid="uid://cx61k8w1q3m2y" path="res://nodes/game/world/target_zone.tscn" id="12_tz0ne"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
 script = ExtResource("2_yqjtg")
 
 [node name="Controllers" type="Node" parent="." index="0" unique_id=1206564580]
 
-[node name="GameLogicController" type="Node" parent="Controllers" index="0" unique_id=1436944778]
+[node name="GameLogicController" type="Node" parent="Controllers" index="0" unique_id=1436944778 node_paths=PackedStringArray("input_ctrl", "wind_ctrl", "level_ctrl", "world_ctrl", "ui_ctrl", "sfx_ctrl", "spawner_ctrl")]
 script = ExtResource("3_lbhrr")
+input_ctrl = NodePath("../InputController")
+wind_ctrl = NodePath("../WindController")
+level_ctrl = NodePath("../LevelController")
+world_ctrl = NodePath("../WorldController")
+ui_ctrl = NodePath("../UIController")
+sfx_ctrl = NodePath("../SfxController")
+spawner_ctrl = NodePath("../SpawnerController")
 
 [node name="SfxController" type="Node" parent="Controllers" index="1" unique_id=1770622458]
 script = ExtResource("4_iywne")
 
-[node name="UIController" type="Node" parent="Controllers" index="2" unique_id=1642448503]
+[node name="UIController" type="Node" parent="Controllers" index="2" unique_id=1642448503 node_paths=PackedStringArray("hud_root", "popup_root")]
 script = ExtResource("5_p57ef")
+hud_root = NodePath("../../UI/HUD")
+popup_root = NodePath("../../UI/Popup")
 
-[node name="WorldController" type="Node" parent="Controllers" index="3" unique_id=1440953779]
+[node name="WorldController" type="Node" parent="Controllers" index="3" unique_id=1440953779 node_paths=PackedStringArray("world_node", "camera", "spawner_controller")]
 script = ExtResource("6_u5sy4")
+world_node = NodePath("../../World")
+camera = NodePath("../../Camera2D")
+spawner_controller = NodePath("../SpawnerController")
 
 [node name="InputController" type="Node" parent="Controllers" index="4" unique_id=56638392]
 script = ExtResource("7_u5sy4")
@@ -37,7 +51,30 @@ script = ExtResource("3_gee14")
 [node name="LevelController" type="Node" parent="Controllers" index="6" unique_id=751596711]
 script = ExtResource("9_0tnpc")
 
-[node name="SpawnerController" type="Node" parent="Controllers" index="7" unique_id=1214762905]
+[node name="SpawnerController" type="Node" parent="Controllers" index="7" unique_id=1214762905 node_paths=PackedStringArray("world_node")]
 script = ExtResource("10_vtaks")
+world_node = NodePath("../../World")
 
 [node name="World" type="Node2D" parent="." index="1" unique_id=256545867]
+
+[node name="TargetZone" parent="World" index="0" unique_id=1549814024 instance=ExtResource("12_tz0ne")]
+position = Vector2(270, 840)
+
+[node name="Troop" parent="World" index="1" unique_id=81183243 instance=ExtResource("11_rp3kd")]
+position = Vector2(270, 90)
+
+[connection signal="mode_button_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="switch_game_mode"]
+[connection signal="next_level_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="advance_to_next_level"]
+[connection signal="retry_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="restart_current_level"]
+[connection signal="troop_hit_obstacle" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_hit_obstacle"]
+[connection signal="troop_landed" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_landed"]
+[connection signal="change_mode_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="switch_game_mode"]
+[connection signal="debug_gust_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="_on_debug_gust_requested"]
+[connection signal="force_drop_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="force_drop_now"]
+[connection signal="restart_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="restart_current_level"]
+[connection signal="tilt_updated" from="Controllers/InputController" to="Controllers/GameLogicController" method="_on_tilt_updated"]
+[connection signal="toggle_debug_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="_on_toggle_debug_requested"]
+[connection signal="gust_warning" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_gust_warning"]
+[connection signal="wind_updated" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_wind_updated"]
+[connection signal="hit_obstacle" from="World/Troop" to="Controllers/WorldController" method="_on_troop_hit_obstacle"]
+[connection signal="landed" from="World/Troop" to="Controllers/WorldController" method="_on_troop_landed"]

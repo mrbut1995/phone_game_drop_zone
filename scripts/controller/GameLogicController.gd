@@ -8,63 +8,30 @@ signal troop_landed_evaluated(result: Dictionary)
 signal game_victory(final_score: int, target_score: int)
 signal game_defeat(final_score: int, target_score: int)
 
-# Tham chiếu các Controllers và Models
+# ============================================================
+# Tham chiếu các Controller (gán trực tiếp trong game.tscn)
+# ============================================================
+@export var input_ctrl: InputController
+@export var wind_ctrl: WindController
+@export var level_ctrl: LevelController
+@export var world_ctrl: WorldController
+@export var ui_ctrl: UIController
+@export var sfx_ctrl: SfxController
+@export var spawner_ctrl: SpawnerController
+
+# Model
 var game_state: GameState
-var input_ctrl: InputController
-var wind_ctrl: WindController
-var level_ctrl: LevelController
-var world_ctrl: WorldController
-var ui_ctrl: UIController
-var sfx_ctrl: SfxController
-var spawner_ctrl: SpawnerController
 
 # Timers
 var countdown_timer: float = 3.0
 var is_counting_down: bool = false
 var last_reported_sec: int = -1
 
-func setup(
-	p_state: GameState,
-	p_input: InputController,
-	p_wind: WindController,
-	p_level: LevelController,
-	p_world: WorldController,
-	p_ui: UIController,
-	p_sfx: SfxController,
-	p_spawner: SpawnerController = null
-) -> void:
-	game_state = p_state
-	input_ctrl = p_input
-	wind_ctrl = p_wind
-	level_ctrl = p_level
-	world_ctrl = p_world
-	ui_ctrl = p_ui
-	sfx_ctrl = p_sfx
-	spawner_ctrl = p_spawner
-	
-	_connect_signals()
+func _ready() -> void:
+	game_state = GameState.new()
 
-func _connect_signals() -> void:
-	if input_ctrl:
-		input_ctrl.tilt_updated.connect(_on_tilt_updated)
-		input_ctrl.force_drop_requested.connect(force_drop_now)
-		input_ctrl.restart_requested.connect(restart_current_level)
-		input_ctrl.debug_gust_requested.connect(func(): if wind_ctrl: wind_ctrl.trigger_manual_gust())
-		input_ctrl.toggle_debug_requested.connect(func(): if ui_ctrl: ui_ctrl.toggle_debug_overlay())
-		input_ctrl.change_mode_requested.connect(switch_game_mode)
-		
-	if wind_ctrl:
-		wind_ctrl.wind_updated.connect(_on_wind_updated)
-		wind_ctrl.gust_warning.connect(_on_gust_warning)
-		
-	if world_ctrl:
-		world_ctrl.troop_landed.connect(_on_world_troop_landed)
-		world_ctrl.troop_hit_obstacle.connect(_on_world_troop_hit_obstacle)
-		
-	if ui_ctrl:
-		ui_ctrl.retry_pressed.connect(restart_current_level)
-		ui_ctrl.next_level_pressed.connect(advance_to_next_level)
-		ui_ctrl.mode_button_pressed.connect(switch_game_mode)
+# Toàn bộ signal giữa các Controller được kết nối trực tiếp trong game.tscn
+# (tab "Node" -> "Signals" của từng Controller), KHÔNG nối trong code nữa.
 
 func start_game(mode: GameState.GameMode = GameState.GameMode.CAMPAIGN) -> void:
 	var level_data: LevelData = level_ctrl.get_current_level_data()
@@ -154,6 +121,14 @@ func _on_gust_warning(dir: float, dur: float) -> void:
 	ui_ctrl.show_gust_warning(dir, dur)
 	if sfx_ctrl:
 		sfx_ctrl.play_gust_alert()
+
+func _on_debug_gust_requested() -> void:
+	if wind_ctrl:
+		wind_ctrl.trigger_manual_gust()
+
+func _on_toggle_debug_requested() -> void:
+	if ui_ctrl:
+		ui_ctrl.toggle_debug_overlay()
 
 func _on_world_troop_landed(land_pos: Vector2) -> void:
 	if game_state.round_state != GameState.RoundState.FALLING:

@@ -5,6 +5,7 @@ signal troop_hit_obstacle(obstacle: Obstacle)
 signal obstacle_spawned(obstacle: Obstacle)
 signal zone_effect_applied(zone: Obstacle, effect_name: String)
 
+# Gán trực tiếp trong game.tscn
 @export var world_node: Node2D
 
 var active_obstacles: Array[Obstacle] = []
@@ -27,9 +28,6 @@ const OBSTACLE_SCENES: Dictionary = {
 
 # Quản lý trạng thái overlap giữa Troop và từng obstacle
 var _overlapping_lethal_obs: Obstacle = null
-
-func setup(p_world: Node2D) -> void:
-	world_node = p_world
 
 func clear_all_obstacles() -> void:
 	for obs in active_obstacles:

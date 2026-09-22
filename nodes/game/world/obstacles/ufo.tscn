@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cyj3an1mvfng"]
 
 [ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_obs"]
-[ext_resource type="Script" path="res://scripts/nodes/game/world/obstacles/ufo.gd" id="2_ufo"]
+[ext_resource type="Script" uid="uid://c675wn3p4m0em" path="res://scripts/nodes/game/world/obstacles/ufo.gd" id="2_ufo"]
 
-[node name="Obstacle" instance=ExtResource("1_obs")]
+[node name="Obstacle" unique_id=1114583439 instance=ExtResource("1_obs")]
 script = ExtResource("2_ufo")

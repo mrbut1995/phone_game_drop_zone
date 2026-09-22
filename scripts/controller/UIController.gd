@@ -6,8 +6,9 @@ signal next_level_pressed
 signal mode_button_pressed(mode_idx: int)
 signal force_drop_pressed
 
-var hud_root: Control
-var popup_root: Control
+# Gán trực tiếp trong game.tscn (UI/HUD và UI/Popup)
+@export var hud_root: Control
+@export var popup_root: Control
 
 # Các UI Node tham chiếu
 var lbl_mode_level: Label
@@ -38,9 +39,7 @@ var lbl_result_details: Label
 var btn_result_action: Button
 var btn_result_retry: Button
 
-func setup(p_hud: Control, p_popup: Control) -> void:
-	hud_root = p_hud
-	popup_root = p_popup
+func _ready() -> void:
 	_build_hud_elements()
 	_build_popup_elements()
 

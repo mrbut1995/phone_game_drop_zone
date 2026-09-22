@@ -4,6 +4,7 @@ extends Node
 signal troop_landed(landing_pos: Vector2)
 signal troop_hit_obstacle(obstacle: Node2D)
 
+# Tham chiếu được gán trực tiếp trong game.tscn
 @export var world_node: Node2D
 @export var camera: Camera2D
 @export var spawner_controller: SpawnerController
@@ -15,11 +16,7 @@ var obstacles: Array[Obstacle] = []
 const DROP_START_POS: Vector2 = Vector2(270.0, 90.0)
 const GROUND_Y: float = 840.0
 
-func setup(p_world: Node2D, p_camera: Camera2D, p_spawner: SpawnerController = null) -> void:
-	world_node = p_world
-	camera = p_camera
-	if p_spawner != null:
-		spawner_controller = p_spawner
+func _ready() -> void:
 	_ensure_world_elements()
 
 func _ensure_world_elements() -> void:

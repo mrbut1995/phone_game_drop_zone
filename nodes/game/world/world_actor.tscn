@@ -4,3 +4,5 @@
 
 [node name="WorldActor" type="Node2D" unique_id=849325145]
 script = ExtResource("1_vjdow")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=312314411]
