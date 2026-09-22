@@ -1,0 +1,39 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://8o24n044sfsq"]
+
+[ext_resource type="Texture2D" uid="uid://dand5180ultlm" path="res://assets/images/placeholder/airplane_spritesheet.svg" id="1_sp7dy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_00wab"]
+atlas = ExtResource("1_sp7dy")
+region = Rect2(0, 0, 72, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p4uxg"]
+atlas = ExtResource("1_sp7dy")
+region = Rect2(72, 0, 72, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y62ps"]
+atlas = ExtResource("1_sp7dy")
+region = Rect2(144, 0, 72, 44)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kvb6c"]
+atlas = ExtResource("1_sp7dy")
+region = Rect2(216, 0, 72, 44)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_00wab")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p4uxg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y62ps")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kvb6c")
+}],
+"loop": 1,
+"name": &"fly",
+"speed": 10.0
+}]

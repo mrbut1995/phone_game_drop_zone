@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://c6mljynmfmtw4"]
+
+[ext_resource type="Texture2D" uid="uid://v4o0hm4e6h04" path="res://assets/images/placeholder/turbulence_zone_spritesheet.svg" id="1_fl67d"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t7o74"]
+atlas = ExtResource("1_fl67d")
+region = Rect2(0, 0, 180, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vdqp7"]
+atlas = ExtResource("1_fl67d")
+region = Rect2(180, 0, 180, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gtshv"]
+atlas = ExtResource("1_fl67d")
+region = Rect2(360, 0, 180, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ofa2k"]
+atlas = ExtResource("1_fl67d")
+region = Rect2(540, 0, 180, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t0y3e"]
+atlas = ExtResource("1_fl67d")
+region = Rect2(720, 0, 180, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jk2ys"]
+atlas = ExtResource("1_fl67d")
+region = Rect2(900, 0, 180, 130)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t7o74")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vdqp7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gtshv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ofa2k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t0y3e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jk2ys")
+}],
+"loop": 1,
+"name": &"loop",
+"speed": 12.0
+}]

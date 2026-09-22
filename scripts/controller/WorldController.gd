@@ -11,7 +11,6 @@ signal troop_hit_obstacle(obstacle: Node2D)
 
 var active_troop: Troop = null
 var target_zone: TargetZone = null
-var obstacles: Array[Obstacle] = []
 
 const DROP_START_POS: Vector2 = Vector2(270.0, 90.0)
 const GROUND_Y: float = 840.0
@@ -22,28 +21,16 @@ func _ready() -> void:
 func _ensure_world_elements() -> void:
 	if world_node == null:
 		return
-		
-	# 1. Tạo TargetZone nếu chưa có
+
+	# Troop + TargetZone được khai báo sẵn trong scene (không tạo node bằng code)
 	target_zone = world_node.get_node_or_null("TargetZone") as TargetZone
-	if target_zone == null:
-		var target_scene = load("res://nodes/game/world/target_zone.tscn")
-		if target_scene:
-			target_zone = target_scene.instantiate() as TargetZone
-			target_zone.name = "TargetZone"
-			target_zone.position = Vector2(270.0, GROUND_Y)
-			world_node.add_child(target_zone)
-			
-	# 2. Tạo Troop nếu chưa có
 	active_troop = world_node.get_node_or_null("Troop") as Troop
+	if target_zone == null:
+		push_warning("WorldController: thiếu node World/TargetZone trong scene")
 	if active_troop == null:
-		var troop_scene = load("res://nodes/game/world/troop.tscn")
-		if troop_scene:
-			active_troop = troop_scene.instantiate() as Troop
-		else:
-			active_troop = Troop.new()
-		active_troop.name = "Troop"
-		world_node.add_child(active_troop)
-		
+		push_warning("WorldController: thiếu node World/Troop trong scene")
+		return
+
 	if not active_troop.landed.is_connected(_on_troop_landed):
 		active_troop.landed.connect(_on_troop_landed)
 	if not active_troop.hit_obstacle.is_connected(_on_troop_hit_obstacle):
@@ -59,23 +46,12 @@ func apply_level_config(level_data: LevelData) -> void:
 			level_data.target_move_range
 		)
 		
-	# Bàn giao việc tạo và quản lý obstacle cho SpawnerController
+	# Toàn bộ obstacle được SpawnerController khởi tạo từ scene tương ứng,
+	# không tạo node bằng code trong WorldController nữa.
 	if spawner_controller:
 		spawner_controller.spawn_level_obstacles(level_data)
 	else:
-		# Fallback nếu chưa gán spawner_controller
-		for obs in obstacles:
-			if is_instance_valid(obs):
-				obs.queue_free()
-		obstacles.clear()
-		for i in range(level_data.obstacle_count):
-			var obs = BirdObstacle.new()
-			world_node.add_child(obs)
-			var dir: float = 1.0 if i % 2 == 0 else -1.0
-			var speed: float = randf_range(60.0, 110.0)
-			var alt_y: float = 340.0 + float(i) * 160.0
-			obs.configure(speed, dir, alt_y)
-			obstacles.append(obs)
+		push_warning("WorldController: chưa gán spawner_controller nên không thể spawn obstacle")
 
 func prepare_troop_for_drop() -> void:
 	_ensure_world_elements()

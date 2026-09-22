@@ -2,5 +2,9 @@
 
 [ext_resource type="Script" uid="uid://ckdmty1bhhgyj" path="res://scripts/nodes/game/world/target_zone.gd" id="1_4d1s7"]
 
-[node name="TargetZone" type="Node2D" unique_id=800325431]
+[node name="TargetZone" type="Area2D" unique_id=800325431]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
 script = ExtResource("1_4d1s7")

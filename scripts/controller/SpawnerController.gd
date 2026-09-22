@@ -135,7 +135,9 @@ func spawn_level_obstacles(level_data: LevelData) -> void:
 				
 		spawn_obstacle(selected_type, config)
 
-# Kiểm tra tương tác giữa Troop và tất cả obstacle mỗi frame
+# Kiểm tra tương tác Troop <-> Obstacle mỗi frame.
+# Va chạm do physics đảm nhiệm: Troop (Area2D) khai báo CollisionShape2D + mask layer 2,
+# nên get_overlapping_areas() trả về đúng các obstacle đang chạm (không tính toán thủ công nữa).
 func check_troop_interactions(troop: Troop, delta: float) -> void:
 	if troop == null or not troop.is_active or troop.has_landed:
 		if _overlapping_lethal_obs != null:
@@ -152,26 +154,25 @@ func check_troop_interactions(troop: Troop, delta: float) -> void:
 		
 	var has_any_lethal_overlap = false
 	
-	for obs in active_obstacles:
-		if not is_instance_valid(obs):
+	for area in troop.get_overlapping_areas():
+		var obs := area as Obstacle
+		if obs == null or not is_instance_valid(obs):
 			continue
-			
-		var is_colliding: bool = obs.check_collision(troop.position)
+		if obs.is_warning_active or not obs.is_ready_to_act:
+			continue
 		
-		# 1. Nếu là VÙNG ĐẶC BIỆT (ZONE_MODIFIER) -> Áp dụng hiệu ứng liên tục lên Troop
+		# 1. VÙNG ĐẶC BIỆT (ZONE_MODIFIER) -> Áp dụng hiệu ứng liên tục lên Troop
 		if obs.obstacle_category == Obstacle.ObstacleCategory.ZONE_MODIFIER:
-			if is_colliding:
-				obs.apply_zone_effect(troop, delta)
-				zone_effect_applied.emit(obs, str(obs.zone_effect))
-				
-		# 2. Nếu là VẬT CẢN NGUY HIỂM (LETHAL hoặc STRUCTURAL)
+			obs.apply_zone_effect(troop, delta)
+			zone_effect_applied.emit(obs, str(obs.zone_effect))
+			
+		# 2. VẬT CẢN NGUY HIỂM (LETHAL hoặc STRUCTURAL)
 		elif obs.obstacle_category in [Obstacle.ObstacleCategory.LETHAL, Obstacle.ObstacleCategory.STRUCTURAL]:
-			if is_colliding:
-				has_any_lethal_overlap = true
-				if _overlapping_lethal_obs != obs:
-					_overlapping_lethal_obs = obs
-					troop.on_obstacle_entered(obs)
-					
+			has_any_lethal_overlap = true
+			if _overlapping_lethal_obs != obs:
+				_overlapping_lethal_obs = obs
+				troop.on_obstacle_entered(obs)
+				
 	# Nếu không còn chạm vật cản lethal nào nữa -> Báo exited để reset Coyote Time
 	if not has_any_lethal_overlap and _overlapping_lethal_obs != null:
 		troop.on_obstacle_exited(_overlapping_lethal_obs)

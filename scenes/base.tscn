@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://bxp5t8ix6qk38"]
 
 [ext_resource type="Script" uid="uid://cnv7brx35tw1v" path="res://scripts/scenes/base.gd" id="1_pvqg0"]
+[ext_resource type="Script" path="res://scripts/controller/ui/BaseUIController.gd" id="2_baseui"]
+[ext_resource type="Script" uid="uid://cby3ypnq5qbrb" path="res://scripts/controller/SfxController.gd" id="3_sfx"]
+[ext_resource type="Script" path="res://scripts/controller/ui/PopupController.gd" id="4_popup"]
 
 [node name="Node2D" type="Node2D" unique_id=1288291301]
 script = ExtResource("1_pvqg0")
@@ -30,3 +33,30 @@ metadata/_edit_use_anchors_ = true
 position = Vector2(273, 483)
 position_smoothing_enabled = true
 rotation_smoothing_enabled = true
+
+[node name="Controllers" type="Node" parent="." index="2" unique_id=1206564580]
+
+[node name="UIController" type="Node" parent="Controllers" index="0" unique_id=1642448503 node_paths=PackedStringArray("hud_root", "popup_root", "popup_ctrl")]
+script = ExtResource("2_baseui")
+hud_root = NodePath("../../UI/HUD")
+popup_root = NodePath("../../UI/Popup")
+popup_ctrl = NodePath("../PopupController")
+
+[node name="SfxController" type="Node" parent="Controllers" index="1" unique_id=1770622458]
+script = ExtResource("3_sfx")
+
+[node name="Player1" type="AudioStreamPlayer" parent="Controllers/SfxController" index="0"]
+
+[node name="Player2" type="AudioStreamPlayer" parent="Controllers/SfxController" index="1"]
+
+[node name="Player3" type="AudioStreamPlayer" parent="Controllers/SfxController" index="2"]
+
+[node name="Player4" type="AudioStreamPlayer" parent="Controllers/SfxController" index="3"]
+
+[node name="Player5" type="AudioStreamPlayer" parent="Controllers/SfxController" index="4"]
+
+[node name="Player6" type="AudioStreamPlayer" parent="Controllers/SfxController" index="5"]
+
+[node name="PopupController" type="Node" parent="Controllers" index="2" unique_id=1954386120 node_paths=PackedStringArray("popup_root")]
+script = ExtResource("4_popup")
+popup_root = NodePath("../../UI/Popup")

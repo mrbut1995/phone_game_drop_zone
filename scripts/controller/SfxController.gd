@@ -1,16 +1,16 @@
 class_name SfxController
 extends Node
 
-# Bộ phát âm thanh tự tạo (Procedural Audio Synth) để game luôn có âm thanh sinh động không sợ thiếu file
+# Bộ phát âm thanh: 6 AudioStreamPlayer (Player1..Player6) được khai báo sẵn trong scene base.tscn
 var player_pool: Array[AudioStreamPlayer] = []
-var max_players: int = 6
 
 func _ready() -> void:
-	for i in range(max_players):
-		var p = AudioStreamPlayer.new()
-		p.bus = "Master"
-		add_child(p)
-		player_pool.append(p)
+	for child in get_children():
+		var p := child as AudioStreamPlayer
+		if p != null:
+			player_pool.append(p)
+	if player_pool.is_empty():
+		push_warning("SfxController: chưa có AudioStreamPlayer nào trong scene")
 
 func _get_available_player() -> AudioStreamPlayer:
 	for p in player_pool:

@@ -1,0 +1,67 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://qr4eein3ruo1"]
+
+[ext_resource type="Texture2D" uid="uid://7jh2v2l2fc6c" path="res://assets/images/placeholder/crane_hook_spritesheet.svg" id="1_dptqu"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g366m"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(0, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cv6xo"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(64, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ge57t"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(128, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_md6k8"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(192, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mvldp"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(256, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n7a3w"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(320, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oeq4p"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(384, 0, 64, 90)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sr68c"]
+atlas = ExtResource("1_dptqu")
+region = Rect2(448, 0, 64, 90)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g366m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cv6xo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ge57t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_md6k8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mvldp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n7a3w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oeq4p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sr68c")
+}],
+"loop": 1,
+"name": &"swing",
+"speed": 10.0
+}]

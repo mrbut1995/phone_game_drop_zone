@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cb5k2yam8w1q3"]
 
-[ext_resource type="Script" uid="uid://bgg183q21lx1b" path="res://scripts/nodes/game/world/obstacles/obstacle.gd" id="1_7hxl5"]
+[ext_resource type="PackedScene" uid="uid://b18gcgc0mishy" path="res://nodes/game/world/world_actor.tscn" id="1_wact"]
+[ext_resource type="Script" uid="uid://bgg183q21lx1b" path="res://scripts/nodes/game/world/obstacles/obstacle.gd" id="2_obst"]
 
-[node name="Obstacle" type="Node2D" unique_id=1416784695]
-script = ExtResource("1_7hxl5")
+[node name="Obstacle" unique_id=849325145 instance=ExtResource("1_wact")]
+script = ExtResource("2_obst")

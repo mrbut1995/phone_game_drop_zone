@@ -1,7 +1,21 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_obs"]
-[ext_resource type="Script" path="res://scripts/nodes/game/world/obstacles/fireworks.gd" id="2_fw"]
+[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_0v430"]
+[ext_resource type="Script" uid="uid://b0u811fqhat8m" path="res://scripts/nodes/game/world/obstacles/fireworks.gd" id="2_fw"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/fireworks_frames.tres" id="3_fwanim"]
 
-[node name="Obstacle" instance=ExtResource("1_obs")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_fw"]
+radius = 8.0
+
+[node name="Obstacle" unique_id=849325145 instance=ExtResource("1_0v430")]
 script = ExtResource("2_fw")
+
+[node name="Sprite" parent="." index="0" unique_id=312314411]
+centered = false
+offset = Vector2(-32, -32)
+sprite_frames = ExtResource("3_fwanim")
+animation = &"warning"
+autoplay = &"warning"
+
+[node name="Collision" parent="." index="1"]
+shape = SubResource("CircleShape2D_fw")

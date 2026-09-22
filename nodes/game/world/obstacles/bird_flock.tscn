@@ -1,7 +1,63 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_obs"]
-[ext_resource type="Script" path="res://scripts/nodes/game/world/obstacles/bird_flock.gd" id="2_flock"]
+[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_0v430"]
+[ext_resource type="Script" uid="uid://bxc5mbrskl5aw" path="res://scripts/nodes/game/world/obstacles/bird_flock.gd" id="2_flock"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/bird_frames.tres" id="3_birdanim"]
 
-[node name="Obstacle" instance=ExtResource("1_obs")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_flock"]
+radius = 8.0
+
+[node name="Obstacle" unique_id=849325145 instance=ExtResource("1_0v430")]
 script = ExtResource("2_flock")
+
+[node name="Sprite" parent="." index="0" unique_id=312314411]
+sprite_frames = ExtResource("3_birdanim")
+animation = &"fly"
+autoplay = &"fly"
+
+[node name="Bird2" type="AnimatedSprite2D" parent="." index="2"]
+position = Vector2(-24, -14)
+speed_scale = 1.1
+sprite_frames = ExtResource("3_birdanim")
+animation = &"fly"
+autoplay = &"fly"
+
+[node name="Bird3" type="AnimatedSprite2D" parent="." index="3"]
+position = Vector2(-48, -26)
+speed_scale = 0.9
+sprite_frames = ExtResource("3_birdanim")
+animation = &"fly"
+autoplay = &"fly"
+
+[node name="Bird4" type="AnimatedSprite2D" parent="." index="4"]
+position = Vector2(-24, 14)
+speed_scale = 1.15
+sprite_frames = ExtResource("3_birdanim")
+animation = &"fly"
+autoplay = &"fly"
+
+[node name="Bird5" type="AnimatedSprite2D" parent="." index="5"]
+position = Vector2(-48, 26)
+speed_scale = 0.85
+sprite_frames = ExtResource("3_birdanim")
+animation = &"fly"
+autoplay = &"fly"
+
+[node name="Collision" parent="." index="1"]
+shape = SubResource("CircleShape2D_flock")
+
+[node name="Collision2" type="CollisionShape2D" parent="." index="6"]
+position = Vector2(-24, -14)
+shape = SubResource("CircleShape2D_flock")
+
+[node name="Collision3" type="CollisionShape2D" parent="." index="7"]
+position = Vector2(-48, -26)
+shape = SubResource("CircleShape2D_flock")
+
+[node name="Collision4" type="CollisionShape2D" parent="." index="8"]
+position = Vector2(-24, 14)
+shape = SubResource("CircleShape2D_flock")
+
+[node name="Collision5" type="CollisionShape2D" parent="." index="9"]
+position = Vector2(-48, 26)
+shape = SubResource("CircleShape2D_flock")

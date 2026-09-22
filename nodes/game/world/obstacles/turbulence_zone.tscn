@@ -1,7 +1,19 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_obs"]
-[ext_resource type="Script" path="res://scripts/nodes/game/world/obstacles/turbulence_zone.gd" id="2_tub"]
+[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_0v430"]
+[ext_resource type="Script" uid="uid://dnt432ltax6dv" path="res://scripts/nodes/game/world/obstacles/turbulence_zone.gd" id="2_tub"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/turbulence_frames.tres" id="3_tubanim"]
 
-[node name="Obstacle" instance=ExtResource("1_obs")]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
+size = Vector2(180, 130)
+
+[node name="Obstacle" unique_id=849325145 instance=ExtResource("1_0v430")]
 script = ExtResource("2_tub")
+
+[node name="Sprite" parent="." index="0" unique_id=312314411]
+sprite_frames = ExtResource("3_tubanim")
+animation = &"loop"
+autoplay = &"loop"
+
+[node name="Collision" parent="." index="1"]
+shape = SubResource("RectangleShape2D_zone")

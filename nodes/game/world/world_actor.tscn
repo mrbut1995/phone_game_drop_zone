@@ -2,7 +2,13 @@
 
 [ext_resource type="Script" uid="uid://cr4nu2k13vqdw" path="res://scripts/nodes/game/world/worldactor.gd" id="1_vjdow"]
 
-[node name="WorldActor" type="Node2D" unique_id=849325145]
+[node name="WorldActor" type="Area2D" unique_id=849325145]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+monitorable = true
 script = ExtResource("1_vjdow")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=312314411]
+[node name="Sprite" type="AnimatedSprite2D" parent="." index="0" unique_id=312314411]
+
+[node name="Collision" type="CollisionShape2D" parent="." index="1"]

@@ -15,7 +15,7 @@ signal game_defeat(final_score: int, target_score: int)
 @export var wind_ctrl: WindController
 @export var level_ctrl: LevelController
 @export var world_ctrl: WorldController
-@export var ui_ctrl: UIController
+@export var ui_ctrl: BaseUIController
 @export var sfx_ctrl: SfxController
 @export var spawner_ctrl: SpawnerController
 

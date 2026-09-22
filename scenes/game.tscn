@@ -4,56 +4,234 @@
 [ext_resource type="Script" uid="uid://c1spois5pixul" path="res://scripts/scenes/game.gd" id="2_yqjtg"]
 [ext_resource type="Script" uid="uid://dfktm3iaovbds" path="res://scripts/controller/WindController.gd" id="3_gee14"]
 [ext_resource type="Script" uid="uid://cd8wbi8kfmkp0" path="res://scripts/controller/GameLogicController.gd" id="3_lbhrr"]
-[ext_resource type="Script" uid="uid://cby3ypnq5qbrb" path="res://scripts/controller/SfxController.gd" id="4_iywne"]
-[ext_resource type="Script" uid="uid://bqoe8sfhdsqpw" path="res://scripts/controller/UIController.gd" id="5_p57ef"]
+[ext_resource type="Script" uid="uid://bqoe8sfhdsqpw" path="res://scripts/controller/ui/GameUIController.gd" id="5_p57ef"]
 [ext_resource type="Script" uid="uid://cvja5uqtvmejh" path="res://scripts/controller/WorldController.gd" id="6_u5sy4"]
 [ext_resource type="Script" uid="uid://dk62uai31vdp0" path="res://scripts/controller/InputController.gd" id="7_u5sy4"]
 [ext_resource type="Script" uid="uid://cq5hrg0vrlfhe" path="res://scripts/controller/LevelController.gd" id="9_0tnpc"]
 [ext_resource type="Script" uid="uid://b87j7571y0ane" path="res://scripts/controller/SpawnerController.gd" id="10_vtaks"]
-[ext_resource type="PackedScene" uid="uid://dvxfboso8aymw" path="res://nodes/game/world/troop.tscn" id="11_rp3kd"]
+[ext_resource type="PackedScene" uid="uid://dvxfboso8aymw" path="res://nodes/game/world/player/troop.tscn" id="11_rp3kd"]
 [ext_resource type="PackedScene" uid="uid://cx61k8w1q3m2y" path="res://nodes/game/world/target_zone.tscn" id="12_tz0ne"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
 script = ExtResource("2_yqjtg")
 
-[node name="Controllers" type="Node" parent="." index="0" unique_id=1206564580]
+[node name="TopBar" type="VBoxContainer" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="0" unique_id=1632041676]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
 
-[node name="GameLogicController" type="Node" parent="Controllers" index="0" unique_id=1436944778 node_paths=PackedStringArray("input_ctrl", "wind_ctrl", "level_ctrl", "world_ctrl", "ui_ctrl", "sfx_ctrl", "spawner_ctrl")]
-script = ExtResource("3_lbhrr")
-input_ctrl = NodePath("../InputController")
-wind_ctrl = NodePath("../WindController")
-level_ctrl = NodePath("../LevelController")
-world_ctrl = NodePath("../WorldController")
-ui_ctrl = NodePath("../UIController")
-sfx_ctrl = NodePath("../SfxController")
-spawner_ctrl = NodePath("../SpawnerController")
+[node name="Row1" type="HBoxContainer" parent="UI/HUD/TopBar" index="0" unique_id=302962879]
+layout_mode = 2
 
-[node name="SfxController" type="Node" parent="Controllers" index="1" unique_id=1770622458]
-script = ExtResource("4_iywne")
+[node name="ModeLevelLabel" type="Label" parent="UI/HUD/TopBar/Row1" index="0" unique_id=1157319315]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 16
+text = "CHIẾN DỊCH - MÀN 1"
 
-[node name="UIController" type="Node" parent="Controllers" index="2" unique_id=1642448503 node_paths=PackedStringArray("hud_root", "popup_root")]
-script = ExtResource("5_p57ef")
-hud_root = NodePath("../../UI/HUD")
-popup_root = NodePath("../../UI/Popup")
+[node name="ModeButton" type="Button" parent="UI/HUD/TopBar/Row1" index="1" unique_id=1900470978]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Đổi Chế Độ [1-3]"
 
-[node name="WorldController" type="Node" parent="Controllers" index="3" unique_id=1440953779 node_paths=PackedStringArray("world_node", "camera", "spawner_controller")]
-script = ExtResource("6_u5sy4")
-world_node = NodePath("../../World")
-camera = NodePath("../../Camera2D")
-spawner_controller = NodePath("../SpawnerController")
+[node name="Row2" type="HBoxContainer" parent="UI/HUD/TopBar" index="1" unique_id=850879610]
+layout_mode = 2
 
-[node name="InputController" type="Node" parent="Controllers" index="4" unique_id=56638392]
-script = ExtResource("7_u5sy4")
+[node name="ScoreLabel" type="Label" parent="UI/HUD/TopBar/Row2" index="0" unique_id=1283234186]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Điểm: 0 / 300"
 
-[node name="WindController" type="Node" parent="Controllers" index="5" unique_id=950285457]
-script = ExtResource("3_gee14")
+[node name="ComboLabel" type="Label" parent="UI/HUD/TopBar/Row2" index="1" unique_id=1446223355]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.2, 1)
+theme_override_font_sizes/font_size = 16
 
-[node name="LevelController" type="Node" parent="Controllers" index="6" unique_id=751596711]
-script = ExtResource("9_0tnpc")
+[node name="ScoreProgress" type="ProgressBar" parent="UI/HUD/TopBar" index="2" unique_id=721501282]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+max_value = 300.0
+show_percentage = false
 
-[node name="SpawnerController" type="Node" parent="Controllers" index="7" unique_id=1214762905 node_paths=PackedStringArray("world_node")]
-script = ExtResource("10_vtaks")
-world_node = NodePath("../../World")
+[node name="TroopsLabel" type="Label" parent="UI/HUD/TopBar" index="3" unique_id=1085701184]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Lính: 1 / 5"
+
+[node name="CountdownLabel" type="Label" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="1" unique_id=2019584755]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -60.0
+offset_right = 150.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 48
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GustBanner" type="PanelContainer" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="2" unique_id=1180272935]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 110.0
+offset_right = 160.0
+offset_bottom = 155.0
+
+[node name="GustLabel" type="Label" parent="UI/HUD/GustBanner" index="0" unique_id=672016363]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 15
+text = "⚠️ GIÓ GIẬT BẤT NGỜ!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IndicatorsPanel" type="PanelContainer" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="3" unique_id=1394242746]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -95.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="IndicatorsVBox" type="VBoxContainer" parent="UI/HUD/IndicatorsPanel" index="0" unique_id=1293897580]
+layout_mode = 2
+
+[node name="TiltRow" type="HBoxContainer" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox" index="0" unique_id=409678658]
+layout_mode = 2
+
+[node name="TiltTitle" type="Label" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox/TiltRow" index="0" unique_id=1193973503]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Tilt (A/D): "
+
+[node name="TiltBarBG" type="ColorRect" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox/TiltRow" index="1" unique_id=1064009301]
+custom_minimum_size = Vector2(180, 14)
+layout_mode = 2
+size_flags_horizontal = 3
+color = Color(0.15, 0.18, 0.25, 0.8)
+
+[node name="TiltNeedle" type="ColorRect" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox/TiltRow/TiltBarBG" index="0" unique_id=395386588]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(8, 14)
+layout_mode = 0
+offset_left = 90.0
+offset_right = 90.0
+color = Color(0.2, 0.85, 1, 1)
+
+[node name="TiltDegLabel" type="Label" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox/TiltRow" index="2" unique_id=1561829156]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "0.0°"
+horizontal_alignment = 2
+
+[node name="WindRow" type="HBoxContainer" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox" index="1" unique_id=854680624]
+layout_mode = 2
+
+[node name="WindLabel" type="Label" parent="UI/HUD/IndicatorsPanel/IndicatorsVBox/WindRow" index="0" unique_id=5636422]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 13
+text = "Gió: Yên lặng (0 px/s)"
+
+[node name="DebugPanel" type="PanelContainer" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="4" unique_id=1218469006]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 16.0
+offset_top = 130.0
+offset_right = 260.0
+offset_bottom = 300.0
+
+[node name="DebugLabel" type="Label" parent="UI/HUD/DebugPanel" index="0" unique_id=1691355406]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "DEBUG TELEMETRY [TAB]"
+
+[node name="ResultPanel" type="PanelContainer" parent="UI/Popup" parent_id_path=PackedInt32Array(553985876) index="0" unique_id=62994139]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -140.0
+offset_right = 180.0
+offset_bottom = 140.0
+
+[node name="ResultVBox" type="VBoxContainer" parent="UI/Popup/ResultPanel" index="0" unique_id=792954033]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResultTitle" type="Label" parent="UI/Popup/ResultPanel/ResultVBox" index="0" unique_id=286301395]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "HOÀN THÀNH!"
+horizontal_alignment = 1
+
+[node name="ResultDetails" type="Label" parent="UI/Popup/ResultPanel/ResultVBox" index="1" unique_id=1429397206]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Tổng điểm: 350 / 300
+Đạt mục tiêu!"
+horizontal_alignment = 1
+
+[node name="ResultButtons" type="HBoxContainer" parent="UI/Popup/ResultPanel/ResultVBox" index="2" unique_id=738691941]
+layout_mode = 2
+alignment = 1
+
+[node name="RetryButton" type="Button" parent="UI/Popup/ResultPanel/ResultVBox/ResultButtons" index="0" unique_id=1955599164]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Chơi Lại [R]"
+
+[node name="NextLevelButton" type="Button" parent="UI/Popup/ResultPanel/ResultVBox/ResultButtons" index="1" unique_id=1454807097]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+text = "Màn Tiếp Theo"
+
+[node name="ModeMenu" type="PopupMenu" parent="UI/Popup" parent_id_path=PackedInt32Array(553985876) index="1" unique_id=1364626276]
+unique_name_in_owner = true
+item_count = 3
+item_0/text = "1. Chiến Dịch (Campaign)"
+item_0/id = 0
+item_1/text = "2. Vô Tận (Endless)"
+item_1/id = 1
+item_2/text = "3. Tập Luyện (Practice)"
+item_2/id = 2
 
 [node name="World" type="Node2D" parent="." index="1" unique_id=256545867]
 
@@ -63,6 +241,44 @@ position = Vector2(270, 840)
 [node name="Troop" parent="World" index="1" unique_id=81183243 instance=ExtResource("11_rp3kd")]
 position = Vector2(270, 90)
 
+[node name="UIController" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="0" unique_id=1642448503]
+script = ExtResource("5_p57ef")
+
+[node name="GameLogicController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="3" unique_id=1436944778 node_paths=PackedStringArray("input_ctrl", "wind_ctrl", "level_ctrl", "world_ctrl", "ui_ctrl", "sfx_ctrl", "spawner_ctrl")]
+script = ExtResource("3_lbhrr")
+input_ctrl = NodePath("../InputController")
+wind_ctrl = NodePath("../WindController")
+level_ctrl = NodePath("../LevelController")
+world_ctrl = NodePath("../WorldController")
+ui_ctrl = NodePath("../UIController")
+sfx_ctrl = NodePath("../SfxController")
+spawner_ctrl = NodePath("../SpawnerController")
+
+[node name="WorldController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="4" unique_id=1440953779 node_paths=PackedStringArray("world_node", "camera", "spawner_controller")]
+script = ExtResource("6_u5sy4")
+world_node = NodePath("../../World")
+camera = NodePath("../../Camera2D")
+spawner_controller = NodePath("../SpawnerController")
+
+[node name="InputController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="5" unique_id=56638392]
+script = ExtResource("7_u5sy4")
+
+[node name="WindController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="6" unique_id=950285457]
+script = ExtResource("3_gee14")
+
+[node name="LevelController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="7" unique_id=751596711]
+script = ExtResource("9_0tnpc")
+
+[node name="SpawnerController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="8" unique_id=1214762905 node_paths=PackedStringArray("world_node")]
+script = ExtResource("10_vtaks")
+world_node = NodePath("../../World")
+
+[connection signal="pressed" from="UI/HUD/TopBar/Row1/ModeButton" to="Controllers/UIController" method="_on_mode_button_pressed"]
+[connection signal="pressed" from="UI/Popup/ResultPanel/ResultVBox/ResultButtons/RetryButton" to="Controllers/UIController" method="_on_retry_button_pressed"]
+[connection signal="pressed" from="UI/Popup/ResultPanel/ResultVBox/ResultButtons/NextLevelButton" to="Controllers/UIController" method="_on_next_level_button_pressed"]
+[connection signal="id_pressed" from="UI/Popup/ModeMenu" to="Controllers/UIController" method="_on_mode_menu_id_pressed"]
+[connection signal="hit_obstacle" from="World/Troop" to="Controllers/WorldController" method="_on_troop_hit_obstacle"]
+[connection signal="landed" from="World/Troop" to="Controllers/WorldController" method="_on_troop_landed"]
 [connection signal="mode_button_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="switch_game_mode"]
 [connection signal="next_level_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="advance_to_next_level"]
 [connection signal="retry_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="restart_current_level"]
@@ -76,5 +292,3 @@ position = Vector2(270, 90)
 [connection signal="toggle_debug_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="_on_toggle_debug_requested"]
 [connection signal="gust_warning" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_gust_warning"]
 [connection signal="wind_updated" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_wind_updated"]
-[connection signal="hit_obstacle" from="World/Troop" to="Controllers/WorldController" method="_on_troop_hit_obstacle"]
-[connection signal="landed" from="World/Troop" to="Controllers/WorldController" method="_on_troop_landed"]

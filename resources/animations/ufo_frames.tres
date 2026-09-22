@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bwd7kifrfqkpb"]
+
+[ext_resource type="Texture2D" uid="uid://x84as4cj5t5l" path="res://assets/images/placeholder/ufo_spritesheet.svg" id="1_xc64a"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wkbsj"]
+atlas = ExtResource("1_xc64a")
+region = Rect2(0, 0, 80, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6lwry"]
+atlas = ExtResource("1_xc64a")
+region = Rect2(80, 0, 80, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bwnff"]
+atlas = ExtResource("1_xc64a")
+region = Rect2(160, 0, 80, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2hxdl"]
+atlas = ExtResource("1_xc64a")
+region = Rect2(240, 0, 80, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_malq5"]
+atlas = ExtResource("1_xc64a")
+region = Rect2(320, 0, 80, 84)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yfjqa"]
+atlas = ExtResource("1_xc64a")
+region = Rect2(400, 0, 80, 84)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wkbsj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6lwry")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bwnff")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2hxdl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_malq5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yfjqa")
+}],
+"loop": 1,
+"name": &"hover",
+"speed": 10.0
+}]

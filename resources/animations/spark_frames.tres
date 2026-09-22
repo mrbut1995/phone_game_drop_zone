@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://b6mfdb7n4h3o3"]
+
+[ext_resource type="Texture2D" uid="uid://bbuy4bheun60a" path="res://assets/images/placeholder/electric_spark_spritesheet.svg" id="1_o2dat"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bkvvr"]
+atlas = ExtResource("1_o2dat")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4u7cc"]
+atlas = ExtResource("1_o2dat")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h0bha"]
+atlas = ExtResource("1_o2dat")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5orr0"]
+atlas = ExtResource("1_o2dat")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bgbxr"]
+atlas = ExtResource("1_o2dat")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kjtaj"]
+atlas = ExtResource("1_o2dat")
+region = Rect2(320, 0, 64, 64)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bkvvr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4u7cc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h0bha")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5orr0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bgbxr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kjtaj")
+}],
+"loop": 1,
+"name": &"zap",
+"speed": 12.0
+}]

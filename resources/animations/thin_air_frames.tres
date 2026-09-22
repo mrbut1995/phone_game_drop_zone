@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" load_steps=8 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/thin_air_zone_spritesheet.svg" id="1_cbu38"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v7ncn"]
+atlas = ExtResource("1_cbu38")
+region = Rect2(0, 0, 170, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tn51i"]
+atlas = ExtResource("1_cbu38")
+region = Rect2(170, 0, 170, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hbwpr"]
+atlas = ExtResource("1_cbu38")
+region = Rect2(340, 0, 170, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5msf7"]
+atlas = ExtResource("1_cbu38")
+region = Rect2(510, 0, 170, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ku08i"]
+atlas = ExtResource("1_cbu38")
+region = Rect2(680, 0, 170, 130)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5yowo"]
+atlas = ExtResource("1_cbu38")
+region = Rect2(850, 0, 170, 130)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v7ncn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tn51i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hbwpr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5msf7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ku08i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5yowo")
+}],
+"loop": true,
+"name": &"loop",
+"speed": 10.0
+}]

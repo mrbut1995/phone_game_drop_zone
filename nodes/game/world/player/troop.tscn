@@ -3,5 +3,15 @@
 [ext_resource type="PackedScene" uid="uid://b18gcgc0mishy" path="res://nodes/game/world/world_actor.tscn" id="1_me1h0"]
 [ext_resource type="Script" uid="uid://mx34j6w7ubty" path="res://scripts/nodes/game/world/troop.gd" id="2_4pukw"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_troop"]
+radius = 5.0
+
 [node name="WorldActor" unique_id=849325145 instance=ExtResource("1_me1h0")]
+collision_layer = 1
+collision_mask = 2
+monitoring = true
+monitorable = false
 script = ExtResource("2_4pukw")
+
+[node name="Collision" parent="." index="1"]
+shape = SubResource("CircleShape2D_troop")

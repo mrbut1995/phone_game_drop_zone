@@ -1,7 +1,85 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_obs"]
-[ext_resource type="Script" path="res://scripts/nodes/game/world/obstacles/powerline.gd" id="2_pw"]
+[ext_resource type="PackedScene" uid="uid://cb5k2yam8w1q3" path="res://nodes/game/world/obstacles/obstacle.tscn" id="1_0v430"]
+[ext_resource type="Script" uid="uid://bcnbt4d21j2gd" path="res://scripts/nodes/game/world/obstacles/powerline.gd" id="2_pw"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/powerline_pole.svg" id="3_pole"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/powerline_cable.svg" id="4_cable"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/spark_frames.tres" id="5_spark"]
 
-[node name="Obstacle" instance=ExtResource("1_obs")]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wire"]
+size = Vector2(44, 6)
+
+[node name="Obstacle" unique_id=849325145 instance=ExtResource("1_0v430")]
 script = ExtResource("2_pw")
+
+[node name="Sprite" parent="." index="0" unique_id=312314411]
+visible = false
+sprite_frames = ExtResource("5_spark")
+animation = &"zap"
+
+[node name="Collision" parent="." index="1"]
+
+[node name="LeftPole" type="Sprite2D" parent="." index="2"]
+position = Vector2(-190, 0)
+centered = false
+offset = Vector2(-20, -15)
+texture = ExtResource("3_pole")
+
+[node name="RightPole" type="Sprite2D" parent="." index="3"]
+position = Vector2(190, 0)
+centered = false
+offset = Vector2(-20, -15)
+texture = ExtResource("3_pole")
+
+[node name="Cable" type="Sprite2D" parent="." index="4"]
+centered = false
+offset = Vector2(-195, -6)
+texture = ExtResource("4_cable")
+
+[node name="CableCollision" type="Node2D" parent="." index="5"]
+
+[node name="Wire1" type="CollisionShape2D" parent="CableCollision" index="0"]
+position = Vector2(-168.9, 4.61)
+rotation = 0.203
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire2" type="CollisionShape2D" parent="CableCollision" index="1"]
+position = Vector2(-126.7, 12.22)
+rotation = 0.1532
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire3" type="CollisionShape2D" parent="CableCollision" index="2"]
+position = Vector2(-84.4, 17.65)
+rotation = 0.1025
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire4" type="CollisionShape2D" parent="CableCollision" index="3"]
+position = Vector2(-42.2, 20.91)
+rotation = 0.0516
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire5" type="CollisionShape2D" parent="CableCollision" index="4"]
+position = Vector2(0, 22)
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire6" type="CollisionShape2D" parent="CableCollision" index="5"]
+position = Vector2(42.2, 20.91)
+rotation = -0.0516
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire7" type="CollisionShape2D" parent="CableCollision" index="6"]
+position = Vector2(84.4, 17.65)
+rotation = -0.1025
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire8" type="CollisionShape2D" parent="CableCollision" index="7"]
+position = Vector2(126.7, 12.22)
+rotation = -0.1532
+shape = SubResource("RectangleShape2D_wire")
+
+[node name="Wire9" type="CollisionShape2D" parent="CableCollision" index="8"]
+position = Vector2(168.9, 4.61)
+rotation = -0.203
+shape = SubResource("RectangleShape2D_wire")
+
+[connection signal="animation_finished" from="Sprite" to="." method="_on_spark_animation_finished"]
