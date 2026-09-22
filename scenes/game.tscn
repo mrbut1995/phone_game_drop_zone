@@ -9,7 +9,6 @@
 [ext_resource type="Script" uid="uid://dk62uai31vdp0" path="res://scripts/controller/InputController.gd" id="7_u5sy4"]
 [ext_resource type="Script" uid="uid://cq5hrg0vrlfhe" path="res://scripts/controller/LevelController.gd" id="9_0tnpc"]
 [ext_resource type="Script" uid="uid://b87j7571y0ane" path="res://scripts/controller/SpawnerController.gd" id="10_vtaks"]
-[ext_resource type="PackedScene" uid="uid://dvxfboso8aymw" path="res://nodes/game/world/player/troop.tscn" id="11_rp3kd"]
 [ext_resource type="PackedScene" uid="uid://cx61k8w1q3m2y" path="res://nodes/game/world/target_zone.tscn" id="12_tz0ne"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_1.tscn" id="13_lvl1"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_2.tscn" id="14_lvl2"]
@@ -17,7 +16,7 @@
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_4.tscn" id="16_lvl4"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_5.tscn" id="17_lvl5"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_6.tscn" id="18_lvl6"]
-[ext_resource type="Script" path="res://scripts/nodes/ui/wind_clock.gd" id="19_wclock"]
+[ext_resource type="PackedScene" path="res://nodes/ui/wind_clock.tscn" id="19_wclock"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
 script = ExtResource("2_yqjtg")
@@ -83,7 +82,7 @@ theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 14
 text = "Lính: 1 / 5"
 
-[node name="WindClock" type="Control" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="1" unique_id=987654321]
+[node name="WindClock" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="1" unique_id=987654321 instance=ExtResource("19_wclock")]
 unique_name_in_owner = true
 layout_mode = 0
 anchor_left = 1.0
@@ -92,7 +91,6 @@ offset_left = -88.0
 offset_top = 16.0
 offset_right = -16.0
 offset_bottom = 88.0
-script = ExtResource("19_wclock")
 
 [node name="CountdownLabel" type="Label" parent="UI/HUD" parent_id_path=PackedInt32Array(287350068) index="1" unique_id=2019584755]
 unique_name_in_owner = true
@@ -263,9 +261,6 @@ item_2/id = 2
 [node name="TargetZone" parent="World" index="0" unique_id=1549814024 instance=ExtResource("12_tz0ne")]
 position = Vector2(270, 840)
 
-[node name="Troop" parent="World" index="1" unique_id=81183243 instance=ExtResource("11_rp3kd")]
-position = Vector2(270, 90)
-
 [node name="UIController" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="0" unique_id=1642448503]
 script = ExtResource("5_p57ef")
 
@@ -303,13 +298,9 @@ world_node = NodePath("../../World")
 [connection signal="pressed" from="UI/Popup/ResultPanel/ResultVBox/ResultButtons/RetryButton" to="Controllers/UIController" method="_on_retry_button_pressed"]
 [connection signal="pressed" from="UI/Popup/ResultPanel/ResultVBox/ResultButtons/NextLevelButton" to="Controllers/UIController" method="_on_next_level_button_pressed"]
 [connection signal="id_pressed" from="UI/Popup/ModeMenu" to="Controllers/UIController" method="_on_mode_menu_id_pressed"]
-[connection signal="hit_obstacle" from="World/Troop" to="Controllers/WorldController" method="_on_troop_hit_obstacle"]
-[connection signal="landed" from="World/Troop" to="Controllers/WorldController" method="_on_troop_landed"]
 [connection signal="mode_button_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="switch_game_mode"]
 [connection signal="next_level_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="advance_to_next_level"]
 [connection signal="retry_pressed" from="Controllers/UIController" to="Controllers/GameLogicController" method="restart_current_level"]
-[connection signal="troop_hit_obstacle" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_hit_obstacle"]
-[connection signal="troop_landed" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_landed"]
 [connection signal="change_mode_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="switch_game_mode"]
 [connection signal="debug_gust_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="_on_debug_gust_requested"]
 [connection signal="force_drop_requested" from="Controllers/InputController" to="Controllers/GameLogicController" method="force_drop_now"]
@@ -320,5 +311,8 @@ world_node = NodePath("../../World")
 [connection signal="wind_updated" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_wind_updated"]
 [connection signal="wind_clock_updated" from="Controllers/WindController" to="Controllers/GameLogicController" method="_on_wind_clock_updated"]
 [connection signal="item_collected" from="Controllers/SpawnerController" to="Controllers/GameLogicController" method="_on_item_collected"]
+[connection signal="individual_troop_landed" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_landed"]
+[connection signal="individual_troop_hit_obstacle" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_hit_obstacle"]
+[connection signal="individual_troop_shield_broken" from="Controllers/WorldController" to="Controllers/GameLogicController" method="_on_world_troop_shield_broken"]
 [connection signal="level_loaded" from="Controllers/LevelController" to="Controllers/WorldController" method="_on_level_loaded"]
 [connection signal="level_loaded" from="Controllers/LevelController" to="Controllers/SpawnerController" method="_on_level_loaded"]

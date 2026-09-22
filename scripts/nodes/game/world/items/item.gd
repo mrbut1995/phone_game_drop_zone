@@ -1,5 +1,5 @@
 class_name Item
-extends Area2D
+extends WorldActor
 
 enum ItemType {
 	COIN,           # Tiền vàng (tiền tệ shop/progression)
@@ -9,30 +9,29 @@ enum ItemType {
 
 signal collected(item: Item, item_type: ItemType, troop: Troop)
 
+# item_type được khai báo riêng trong từng scene (coin.tscn / shield_bubble.tscn / backup_chute.tscn)
 @export var item_type: ItemType = ItemType.COIN
 @export var pickup_radius: float = 22.0 # Hitbox nhặt rộng hơn để dễ thu thập
+# Nhấp nhô nhẹ cho item sống động (mỗi item lệch pha để không cùng nhịp)
+@export var bob_amplitude: float = 4.0
+@export var bob_speed: float = 3.5
+@export var bob_phase: float = 0.0
 
-var anim_time: float = 0.0
 var base_y: float = 0.0
+var bob_time: float = 0.0
 var is_collected: bool = false
 
 func _ready() -> void:
 	z_index = 9
 	base_y = position.y
-	# Thiết lập Collision layer nếu dùng Area2D
-	collision_layer = 4 # Layer 3 (bit 4) cho Item
-	collision_mask = 1  # Mask 1 (Troop)
-	monitoring = true
-	monitorable = true
-	queue_redraw()
+	bob_time = bob_phase
 
 func _process(delta: float) -> void:
 	if is_collected:
 		return
-	anim_time += delta
-	# Hiệu ứng nổi bồng bềnh lên xuống nhẹ
-	position.y = base_y + sin(anim_time * 3.5) * 4.0
-	queue_redraw()
+	bob_time += delta
+	# Hiệu ứng nổi bồng bềnh lên xuống nhẹ (hình ảnh do Sprite/SpriteFrames đảm nhiệm)
+	position.y = base_y + sin(bob_time * bob_speed) * bob_amplitude
 
 func check_collection(troop_pos: Vector2) -> bool:
 	if is_collected:
@@ -53,5 +52,6 @@ func collect(troop: Troop) -> void:
 	tw.tween_property(self, "modulate:a", 0.0, 0.25)
 	tw.chain().tween_callback(queue_free)
 
+# Hook cho lớp con (ví dụ Shield Bubble cấp khiên cho lính)
 func on_collected(_troop: Troop) -> void:
 	pass

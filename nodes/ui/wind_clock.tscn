@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/nodes/ui/wind_clock.gd" id="1_wind"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/wind_clock_dial.svg" id="2_dial"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/wind_clock_needle.svg" id="3_needle"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/wind_clock_hub.svg" id="4_hub"]
+
+[node name="WindClock" type="Control"]
+custom_minimum_size = Vector2(72, 72)
+offset_right = 72.0
+offset_bottom = 72.0
+mouse_filter = 2
+script = ExtResource("1_wind")
+
+[node name="Dial" type="TextureRect" parent="."]
+unique_name_in_owner = true
+offset_right = 144.0
+offset_bottom = 144.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("2_dial")
+
+[node name="GhostNeedle" type="TextureRect" parent="."]
+unique_name_in_owner = true
+offset_left = 24.0
+offset_top = -28.0
+offset_right = 48.0
+offset_bottom = 36.0
+pivot_offset = Vector2(12, 64)
+scale = Vector2(0.5, 0.5)
+modulate = Color(0.35, 0.9, 1, 0.45)
+mouse_filter = 2
+texture = ExtResource("3_needle")
+
+[node name="Needle" type="TextureRect" parent="."]
+unique_name_in_owner = true
+offset_left = 24.0
+offset_top = -28.0
+offset_right = 48.0
+offset_bottom = 36.0
+pivot_offset = Vector2(12, 64)
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("3_needle")
+
+[node name="Hub" type="TextureRect" parent="."]
+unique_name_in_owner = true
+offset_left = 28.0
+offset_top = 28.0
+offset_right = 60.0
+offset_bottom = 60.0
+scale = Vector2(0.5, 0.5)
+mouse_filter = 2
+texture = ExtResource("4_hub")

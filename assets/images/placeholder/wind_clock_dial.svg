@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 144" width="144" height="144">
+  <!-- WIND CLOCK DIAL placeholder (vẽ ở 2x, scale 0.5 khi hiển thị) -->
+  <!-- Mặt kính tối -->
+  <circle cx="72" cy="72" r="68" fill="#1a2433" fill-opacity="0.85" />
+  <circle cx="72" cy="72" r="68" fill="none" stroke="#5a80a6" stroke-width="4" stroke-opacity="0.9" />
+  <circle cx="72" cy="72" r="58" fill="none" stroke="#3d5a78" stroke-width="1.5" stroke-opacity="0.5" />
+
+  <!-- Vạch chia độ (mỗi 22.5°, trải nửa trên) -->
+  <g stroke="#b3d9ff" stroke-linecap="round">
+    <line x1="6" y1="72" x2="16" y2="72" stroke-width="3" stroke-opacity="0.6" />
+    <line x1="11.0" y1="46.7" x2="16.6" y2="49.0" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="25.3" y1="25.3" x2="32.4" y2="32.4" stroke-width="3" stroke-opacity="0.6" />
+    <line x1="46.7" y1="11.0" x2="49.0" y2="16.6" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="72" y1="6" x2="72" y2="16" stroke-width="3" stroke-opacity="0.75" />
+    <line x1="97.3" y1="11.0" x2="95.0" y2="16.6" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="118.7" y1="25.3" x2="111.6" y2="32.4" stroke-width="3" stroke-opacity="0.6" />
+    <line x1="133.0" y1="46.7" x2="127.4" y2="49.0" stroke-width="2" stroke-opacity="0.3" />
+    <line x1="138" y1="72" x2="128" y2="72" stroke-width="3" stroke-opacity="0.6" />
+  </g>
+
+  <!-- Mốc 12h (hướng lặng gió) -->
+  <circle cx="72" cy="12" r="4" fill="#66e6ff" fill-opacity="0.85" />
+</svg>

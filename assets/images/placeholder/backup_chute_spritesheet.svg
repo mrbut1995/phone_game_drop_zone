@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 48" width="192" height="48">
+  <!-- BACKUP CHUTE placeholder - 4 frame 48x48: dù cứu viện nhấp nhô -->
+  <!-- Frame 0 -->
+  <g transform="translate(24,26)">
+    <circle r="20" fill="#3ce666" fill-opacity="0.2" />
+    <polygon points="-14,-2 -9,-14 0,-18 9,-14 14,-2 0,-1" fill="#f2f2ff" stroke="#3373e6" stroke-width="1.5" />
+    <line x1="-12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="0" y1="1" x2="0" y2="13" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <line x1="-6" y1="7" x2="6" y2="7" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <circle cy="7" r="1.5" fill="#ffffff" />
+  </g>
+
+  <!-- Frame 1 -->
+  <g transform="translate(72,26) scale(1.05)">
+    <circle r="20" fill="#3ce666" fill-opacity="0.24" />
+    <polygon points="-14,-2 -9,-14 0,-18 9,-14 14,-2 0,-1" fill="#f2f2ff" stroke="#3373e6" stroke-width="1.5" />
+    <line x1="-12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="0" y1="1" x2="0" y2="13" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <line x1="-6" y1="7" x2="6" y2="7" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <circle cy="7" r="1.5" fill="#ffffff" />
+  </g>
+
+  <!-- Frame 2 -->
+  <g transform="translate(120,26) scale(1.1)">
+    <circle r="20" fill="#3ce666" fill-opacity="0.28" />
+    <polygon points="-14,-2 -9,-14 0,-18 9,-14 14,-2 0,-1" fill="#f2f2ff" stroke="#3373e6" stroke-width="1.5" />
+    <line x1="-12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="0" y1="1" x2="0" y2="13" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <line x1="-6" y1="7" x2="6" y2="7" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <circle cy="7" r="1.5" fill="#ffffff" />
+  </g>
+
+  <!-- Frame 3 -->
+  <g transform="translate(168,26) scale(1.05)">
+    <circle r="20" fill="#3ce666" fill-opacity="0.24" />
+    <polygon points="-14,-2 -9,-14 0,-18 9,-14 14,-2 0,-1" fill="#f2f2ff" stroke="#3373e6" stroke-width="1.5" />
+    <line x1="-12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="12" y1="-2" x2="0" y2="7" stroke="#8090a6" stroke-width="1.2" />
+    <line x1="0" y1="1" x2="0" y2="13" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <line x1="-6" y1="7" x2="6" y2="7" stroke="#33ff66" stroke-width="3" stroke-linecap="round" />
+    <circle cy="7" r="1.5" fill="#ffffff" />
+  </g>
+</svg>

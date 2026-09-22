@@ -1,7 +1,14 @@
-[gd_scene format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="PackedScene" path="res://nodes/game/world/items/item.tscn" id="1_item"]
 [ext_resource type="Script" path="res://scripts/nodes/game/world/items/coin.gd" id="2_coin"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/coin_frames.tres" id="3_frames"]
 
-[node name="Coin" instance=ExtResource("1_item")]
+[node name="Coin" unique_id=849325145 instance=ExtResource("1_item")]
 script = ExtResource("2_coin")
+item_type = 0
+
+[node name="Sprite" parent="." index="0"]
+sprite_frames = ExtResource("3_frames")
+animation = &"spin"
+autoplay = &"spin"

@@ -1,14 +1,17 @@
-[gd_scene format=3 uid="uid://df7k2m1q8w4xp"]
+[gd_scene load_steps=4 format=3 uid="uid://df7k2m1q8w4xp"]
 
-[ext_resource type="Script" path="res://scripts/nodes/game/world/items/item.gd" id="1_item"]
+[ext_resource type="PackedScene" uid="uid://b18gcgc0mishy" path="res://nodes/game/world/world_actor.tscn" id="1_wact"]
+[ext_resource type="Script" path="res://scripts/nodes/game/world/items/item.gd" id="2_item"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_item"]
 radius = 22.0
 
-[node name="Item" type="Area2D"]
+[node name="Item" unique_id=849325145 instance=ExtResource("1_wact")]
 collision_layer = 4
 collision_mask = 1
-script = ExtResource("1_item")
+monitoring = true
+monitorable = true
+script = ExtResource("2_item")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="Collision" parent="." index="1"]
 shape = SubResource("CircleShape2D_item")

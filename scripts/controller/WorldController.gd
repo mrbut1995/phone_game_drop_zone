@@ -5,6 +5,7 @@ signal troop_landed(landing_pos: Vector2)
 signal troop_hit_obstacle(obstacle: Node2D)
 signal individual_troop_landed(troop: Troop, landing_pos: Vector2)
 signal individual_troop_hit_obstacle(troop: Troop, obstacle: Node2D)
+signal individual_troop_shield_broken(troop: Troop)
 
 # Tham chiếu được gán trực tiếp trong game.tscn
 @export var world_node: Node2D
@@ -31,21 +32,19 @@ func _ensure_world_elements() -> void:
 	if world_node == null:
 		return
 
+	# Bia mục tiêu khai báo sẵn trong scene (Troop được sinh runtime theo Continuous Drop)
 	target_zone = world_node.get_node_or_null("TargetZone") as TargetZone
 	if target_zone == null:
 		push_warning("WorldController: thiếu node World/TargetZone trong scene")
-		
-	var default_troop = world_node.get_node_or_null("Troop") as Troop
-	if default_troop != null and not active_troops.has(default_troop):
-		active_troops.append(default_troop)
-		active_troop = default_troop
-		_bind_troop_signals(default_troop)
 
+# Gắn signal cho 1 Troop bất kỳ (dùng khi spawn runtime hoặc bind troop có sẵn)
 func _bind_troop_signals(troop: Troop) -> void:
 	if not troop.landed.is_connected(_on_troop_landed_handler):
 		troop.landed.connect(func(pos): _on_troop_landed_handler(troop, pos))
 	if not troop.hit_obstacle.is_connected(_on_troop_hit_obstacle_handler):
 		troop.hit_obstacle.connect(func(obs): _on_troop_hit_obstacle_handler(troop, obs))
+	if not troop.shield_broken.is_connected(_on_troop_shield_broken_handler):
+		troop.shield_broken.connect(func(): _on_troop_shield_broken_handler(troop))
 
 # Nối với signal "level_loaded" của LevelController trong game.tscn
 func _on_level_loaded(level: BaseLevel) -> void:
@@ -77,6 +76,14 @@ func clear_all_troops() -> void:
 	active_troops.clear()
 	active_troop = null
 
+# Số nhân vật còn đang trên không (chưa chạm đất) - dùng để giới hạn spawn đồng thời
+func get_airborne_count() -> int:
+	var n: int = 0
+	for t in active_troops:
+		if is_instance_valid(t) and not t.has_landed:
+			n += 1
+	return n
+
 # Tạo một Troop mới trong chế độ Continuous Drop (Update_Feature.md Section 2)
 func spawn_continuous_troop(spawn_x: float, color_idx: int) -> Troop:
 	_ensure_world_elements()
@@ -91,7 +98,16 @@ func spawn_continuous_troop(spawn_x: float, color_idx: int) -> Troop:
 	troop.init_troop(drop_pos, ground_y, color_idx)
 	troop.start_drop()
 	active_troops.append(troop)
+	# Nhân vật vừa thả đảm nhận vai trò dẫn đầu nếu chưa có ai
+	if active_troop == null or not is_instance_valid(active_troop):
+		active_troop = troop
 	return troop
+
+# Cao độ nhân vật dẫn đầu (dùng để tính gió theo độ cao; chưa có thì lấy điểm thả)
+func get_lead_y() -> float:
+	if active_troop != null and is_instance_valid(active_troop):
+		return active_troop.position.y
+	return DROP_START_POS.y
 
 # Chuẩn bị cho lượt đầu tiên
 func prepare_troop_for_drop() -> void:
@@ -154,6 +170,9 @@ func _on_troop_landed_handler(troop: Troop, pos: Vector2) -> void:
 func _on_troop_hit_obstacle_handler(troop: Troop, obs: Node2D) -> void:
 	individual_troop_hit_obstacle.emit(troop, obs)
 	troop_hit_obstacle.emit(obs)
+
+func _on_troop_shield_broken_handler(troop: Troop) -> void:
+	individual_troop_shield_broken.emit(troop)
 
 # Phản hồi khi lính đụng chướng ngại vật: hiệu ứng nổ + rung camera
 func play_hit_feedback(hit_pos: Vector2) -> void:

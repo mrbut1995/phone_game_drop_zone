@@ -15,6 +15,9 @@ extends Node
 @export var sfx_miss: AudioStream = preload("res://assets/sfx/miss.wav")
 @export var sfx_gust_alert: AudioStream = preload("res://assets/sfx/gust_alert.wav")
 @export var sfx_hit_impact: AudioStream = preload("res://assets/sfx/hit_impact.wav")
+@export var sfx_coin_pickup: AudioStream = preload("res://assets/sfx/coin_pickup.wav")
+@export var sfx_powerup: AudioStream = preload("res://assets/sfx/powerup.wav")
+@export var sfx_shield_break: AudioStream = preload("res://assets/sfx/shield_break.wav")
 
 # Biến thiên pitch nhẹ để tiếng lặp lại (countdown, miss) không bị khô
 @export var pitch_variation: float = 0.04
@@ -70,3 +73,13 @@ func play_gust_alert() -> void:
 
 func play_hit_impact() -> void:
 	play_sfx(sfx_hit_impact, 1.0, true)
+
+# Nhặt vật phẩm (Update_Feature.md Section 1)
+func play_coin_pickup() -> void:
+	play_sfx(sfx_coin_pickup, -2.0, true)
+
+func play_powerup() -> void:
+	play_sfx(sfx_powerup, 0.0, true)
+
+func play_shield_break() -> void:
+	play_sfx(sfx_shield_break, 1.0, true)

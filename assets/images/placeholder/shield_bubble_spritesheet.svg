@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48" width="240" height="48">
+  <!-- SHIELD BUBBLE placeholder - 5 frame 48x48: bong bóng khiên phập phồng -->
+  <!-- Frame 0 -->
+  <g transform="translate(24,24)">
+    <circle r="22" fill="#33e6ff" fill-opacity="0.18" />
+    <circle r="15" fill="#4de6ff" fill-opacity="0.42" />
+    <circle r="15" fill="none" stroke="#b3f5ff" stroke-width="2" stroke-opacity="0.9" />
+    <circle cx="-5" cy="-6" r="3" fill="#ffffff" fill-opacity="0.75" />
+    <polygon points="-6,-7 6,-7 6,0 0,8 -6,0" fill="#ffffff" fill-opacity="0.9" stroke="#33b3e6" stroke-width="1.2" />
+  </g>
+
+  <!-- Frame 1 -->
+  <g transform="translate(72,24)">
+    <circle r="22.5" fill="#33e6ff" fill-opacity="0.22" />
+    <circle r="16" fill="#4de6ff" fill-opacity="0.44" />
+    <circle r="16" fill="none" stroke="#b3f5ff" stroke-width="2" stroke-opacity="0.95" />
+    <circle cx="-5" cy="-6" r="3" fill="#ffffff" fill-opacity="0.75" />
+    <polygon points="-6,-7 6,-7 6,0 0,8 -6,0" fill="#ffffff" fill-opacity="0.9" stroke="#33b3e6" stroke-width="1.2" />
+  </g>
+
+  <!-- Frame 2 (căng nhất) -->
+  <g transform="translate(120,24)">
+    <circle r="23" fill="#33e6ff" fill-opacity="0.28" />
+    <circle r="17" fill="#4de6ff" fill-opacity="0.46" />
+    <circle r="17" fill="none" stroke="#d6fbff" stroke-width="2" stroke-opacity="1" />
+    <circle cx="-5" cy="-6" r="3" fill="#ffffff" fill-opacity="0.8" />
+    <polygon points="-6,-7 6,-7 6,0 0,8 -6,0" fill="#ffffff" fill-opacity="0.95" stroke="#33b3e6" stroke-width="1.2" />
+  </g>
+
+  <!-- Frame 3 -->
+  <g transform="translate(168,24)">
+    <circle r="22.5" fill="#33e6ff" fill-opacity="0.22" />
+    <circle r="16" fill="#4de6ff" fill-opacity="0.44" />
+    <circle r="16" fill="none" stroke="#b3f5ff" stroke-width="2" stroke-opacity="0.95" />
+    <circle cx="-5" cy="-6" r="3" fill="#ffffff" fill-opacity="0.75" />
+    <polygon points="-6,-7 6,-7 6,0 0,8 -6,0" fill="#ffffff" fill-opacity="0.9" stroke="#33b3e6" stroke-width="1.2" />
+  </g>
+
+  <!-- Frame 4 -->
+  <g transform="translate(216,24)">
+    <circle r="22" fill="#33e6ff" fill-opacity="0.18" />
+    <circle r="15" fill="#4de6ff" fill-opacity="0.42" />
+    <circle r="15" fill="none" stroke="#b3f5ff" stroke-width="2" stroke-opacity="0.9" />
+    <circle cx="-5" cy="-6" r="3" fill="#ffffff" fill-opacity="0.75" />
+    <polygon points="-6,-7 6,-7 6,0 0,8 -6,0" fill="#ffffff" fill-opacity="0.9" stroke="#33b3e6" stroke-width="1.2" />
+  </g>
+</svg>

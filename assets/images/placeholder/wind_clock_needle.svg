@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-12 -64 24 64" width="24" height="64">
+  <!-- WIND CLOCK NEEDLE placeholder: kim chĩa lên trên, TRỤC QUAY ở (0,0) = đáy giữa.
+       Node TextureRect đặt pivot_offset = (12, 64) để xoay quanh tâm đồng hồ. -->
+  <polygon points="-4.2,-48 0,-64 4.2,-48 2.6,-10 0,-4 -2.6,-10" fill="#ffffff" />
+  <circle cx="0" cy="-6" r="3.4" fill="#ffffff" fill-opacity="0.9" />
+</svg>

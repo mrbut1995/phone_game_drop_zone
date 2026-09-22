@@ -1,0 +1,46 @@
+[gd_resource type="SpriteFrames" load_steps=7 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/shield_bubble_spritesheet.svg" id="1_oijug"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pvgma"]
+atlas = ExtResource("1_oijug")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s6g4a"]
+atlas = ExtResource("1_oijug")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n5ukb"]
+atlas = ExtResource("1_oijug")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_46wql"]
+atlas = ExtResource("1_oijug")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_664ps"]
+atlas = ExtResource("1_oijug")
+region = Rect2(192, 0, 48, 48)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pvgma")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s6g4a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n5ukb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_46wql")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_664ps")
+}],
+"loop": true,
+"name": &"pulse",
+"speed": 8.0
+}]

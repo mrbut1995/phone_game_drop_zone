@@ -61,12 +61,16 @@ func spawn_item(scene: PackedScene, pos: Vector2, parent: Node2D = null) -> Item
 	var it: Item = scene.instantiate() as Item
 	if it == null:
 		return null
-		
+
+	# Đặt vị trí + pha nhấp nhô TRƯỚC khi add_child: Item._ready() lấy position làm mốc bob
+	it.position = pos
+	it.bob_phase = randf() * TAU
+
 	var host: Node = parent
 	if host == null or not host.is_inside_tree():
 		host = world_node if (world_node != null and world_node.is_inside_tree()) else self
 	host.add_child(it)
-	it.position = pos
+	it.base_y = pos.y
 	active_items.append(it)
 	return it
 
