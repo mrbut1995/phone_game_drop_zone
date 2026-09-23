@@ -15,6 +15,10 @@ signal individual_troop_shield_broken(troop: Troop)
 # Scene VFX spawn rời (kế thừa nodes/vfx/vfx.tscn) - gán trong game.tscn
 @export var shield_break_vfx_scene: PackedScene
 @export var pickup_vfx_scene: PackedScene
+# Scene chữ điểm nổi (style khai báo trong scene) - gán trong game.tscn
+@export var floating_score_scene: PackedScene
+# Điểm từ ngưỡng này trở lên thì dùng style "to" (khai báo trong floating_score.tscn)
+const BIG_SCORE_MIN_POINTS: int = 70
 const TROOP_SCENE: PackedScene = preload("res://nodes/game/world/player/troop.tscn")
 
 var active_troop: Troop = null # Troop dẫn đầu (gần đất nhất)
@@ -250,26 +254,28 @@ func _shake_camera(duration: float = 0.32, magnitude: float = 14.0) -> void:
 	tw.tween_property(camera, "offset", Vector2.ZERO, 0.05)
 
 # Hiệu ứng nổi chữ điểm số (Floating text) tại vị trí đáp
-func spawn_floating_score(score_info: Dictionary, land_pos: Vector2) -> void:
-	var label = Label.new()
+# KHÔNG tạo Label bằng code nữa: instantiate scene floating_score.tscn (style trong scene),
+# script của scene chỉ nhận dữ liệu (nội dung / màu / có nhấn mạnh) rồi tự chạy hiệu ứng.
+func spawn_floating_score(score_info: Dictionary, land_pos: Vector2) -> FloatingScore:
+	if floating_score_scene == null or world_node == null:
+		push_warning("WorldController: chưa gán floating_score_scene trong game.tscn")
+		return null
+
+	var score := floating_score_scene.instantiate() as FloatingScore
+	if score == null:
+		return null
+
+	world_node.add_child(score)
+	var is_big: bool = int(score_info.get("points", 0)) >= BIG_SCORE_MIN_POINTS
+	score.show_score(_compose_score_text(score_info), score_info.get("color", Color.WHITE), is_big, land_pos)
+	return score
+
+# Ghép nội dung chữ: dùng "text" nếu có, ngược lại tự ghép theo điểm + combo
+func _compose_score_text(score_info: Dictionary) -> String:
 	var text_str: String = score_info.get("text", "")
-	if text_str == "":
-		text_str = "+%d %s" % [score_info.get("points", 0), score_info.get("ring_name", "")]
-		if score_info.has("multiplier") and score_info["multiplier"] > 1:
-			text_str += "\nCOMBO x%d!" % score_info["multiplier"]
-		
-	label.text = text_str
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	label.position = land_pos + Vector2(-120, -50)
-	label.size = Vector2(240, 50)
-	label.add_theme_color_override("font_color", score_info.get("color", Color.WHITE))
-	label.add_theme_font_size_override("font_size", 20 if score_info.get("points", 0) >= 70 else 16)
-	label.z_index = 25
-	world_node.add_child(label)
-	
-	var tw = create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(label, "position:y", label.position.y - 70.0, 1.2).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_property(label, "modulate:a", 0.0, 1.2).set_delay(0.4)
-	tw.chain().tween_callback(label.queue_free)
+	if text_str != "":
+		return text_str
+	text_str = "+%d %s" % [score_info.get("points", 0), score_info.get("ring_name", "")]
+	if score_info.has("multiplier") and score_info["multiplier"] > 1:
+		text_str += "\nCOMBO x%d!" % score_info["multiplier"]
+	return text_str

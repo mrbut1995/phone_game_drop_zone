@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_7.tscn" id="20_lvl7"]
 [ext_resource type="PackedScene" path="res://nodes/game/world/fx/shield_break_vfx.tscn" id="21_shieldfx"]
 [ext_resource type="PackedScene" path="res://nodes/game/world/fx/spark_vfx.tscn" id="22_pickupfx"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/fx/floating_score.tscn" id="23_scorefx"]
 [ext_resource type="PackedScene" path="res://nodes/ui/wind_clock.tscn" id="19_wclock"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
@@ -284,6 +285,7 @@ camera = NodePath("../../Camera2D")
 spawner_controller = NodePath("../SpawnerController")
 shield_break_vfx_scene = ExtResource("21_shieldfx")
 pickup_vfx_scene = ExtResource("22_pickupfx")
+floating_score_scene = ExtResource("23_scorefx")
 
 [node name="InputController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="5" unique_id=56638392]
 script = ExtResource("7_u5sy4")
