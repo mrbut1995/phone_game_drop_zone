@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://nodes/game/level/Level.tscn" id="1_level"]
+[ext_resource type="Script" path="res://scripts/nodes/game/level/obstacle_spawn.gd" id="2_spawn"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/powerline.tscn" id="3_power"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/airplane.tscn" id="4_plane"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/crane.tscn" id="5_crane"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/obstacles/thin_air_zone.tscn" id="6_thin"]
+
+[node name="Level7" unique_id=242200477 instance=ExtResource("1_level")]
+level_number = 7
+level_name = "Màn 7: Xung Đột Hướng"
+total_troops = 5
+target_score = 420
+base_wind_min = -135.0
+base_wind_max = 135.0
+gust_interval = 3.0
+target_moving = true
+target_speed = 2.1
+target_move_range = 145.0
+coin_cluster_count = 3
+coins_per_cluster = 5
+shield_item_count = 1
+backup_item_count = 1
+
+[node name="Background" parent="." index="0"]
+modulate = Color(1, 0.86, 0.78, 1)
+
+[node name="AirplaneSpawn" type="Node2D" parent="SpawnObstacles" index="0"]
+position = Vector2(600, 300)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("4_plane")
+direction = -1.0
+speed = 150.0
+
+[node name="PowerlineSpawn" type="Node2D" parent="SpawnObstacles" index="1"]
+position = Vector2(270, 430)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("3_power")
+extra_params = {
+"line_width": 320.0
+}
+
+[node name="ThinAirSpawn" type="Node2D" parent="SpawnObstacles" index="2"]
+position = Vector2(150, 640)
+script = ExtResource("2_spawn")
+obstacle_scene = ExtResource("6_thin")
+extra_params = {
+"multiplier": 1.4
+}
+
+[node name="CraneFixed" parent="Obstacles" index="0" instance=ExtResource("5_crane")]
+position = Vector2(500, 560)
+is_facing_right = false

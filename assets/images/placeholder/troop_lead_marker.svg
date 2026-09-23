@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -80 60 112" width="120" height="224">
+  <!-- LEAD TROOP MARKER (highlight nhân vật gần chạm đất nhất - Update_Feature.md 3.2)
+       Vẽ ở 2x: Sprite dùng offset (-60,-160) + scale 0.5 -->
+  <!-- Vòng sáng quanh thân -->
+  <circle cx="0" cy="4" r="22" fill="none" stroke="#ffd93d" stroke-width="3.5" stroke-opacity="0.9" />
+  <circle cx="0" cy="4" r="26.5" fill="none" stroke="#ffd93d" stroke-width="1.5" stroke-opacity="0.45" />
+  <!-- Mũi tên chỉ thị phía trên dù -->
+  <polygon points="-7,-76 7,-76 0,-64" fill="#ffd93d" />
+  <polygon points="-4.5,-76 4.5,-76 0,-68.5" fill="#fff6cc" fill-opacity="0.9" />
+</svg>

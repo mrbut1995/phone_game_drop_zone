@@ -17,6 +17,10 @@ extends Control
 @export var needle_max_length: float = 1.0
 @export var ghost_length_factor: float = 0.7
 @export var ghost_color: Color = Color(0.35, 0.9, 1.0, 0.45)
+# Khi có gust sắp tới, kim phụ vọt dài ra và đổi sang màu cảnh báo (Update_Feature.md 5.2)
+@export var ghost_warning_color: Color = Color(1.0, 0.62, 0.25, 0.8)
+@export var gust_alert_threshold: float = 0.10
+@export var ghost_jump_speed: float = 0.18
 
 @onready var needle: TextureRect = %Needle
 @onready var ghost_needle: TextureRect = %GhostNeedle
@@ -28,6 +32,7 @@ var target_predicted_wind: float = 0.0
 
 var smooth_current_angle: float = 0.0
 var smooth_ghost_angle: float = 0.0
+var smooth_ghost_length: float = 0.7
 
 func _ready() -> void:
 	_update_needles()
@@ -45,9 +50,9 @@ func _process(delta: float) -> void:
 	smooth_ghost_angle = lerp_angle(smooth_ghost_angle, target_ghost_angle, delta * 12.0)
 	current_wind = lerp(current_wind, target_wind, delta * 8.0)
 
-	_update_needles()
+	_update_needles(delta)
 
-func _update_needles() -> void:
+func _update_needles(delta: float = 0.0) -> void:
 	var wind_abs: float = absf(current_wind)
 	var intensity: float = clampf(wind_abs / max_wind_range, 0.0, 1.0)
 
@@ -57,11 +62,19 @@ func _update_needles() -> void:
 		needle.scale = Vector2(art_scale, art_scale * lerpf(needle_min_length, needle_max_length, intensity))
 		needle.modulate = needle_color(wind_abs)
 
-	# Kim phụ dự báo: quay trước kim chính, luôn mờ hơn
+	# Kim phụ dự báo (Update_Feature.md 5.2):
+	#  - Bình thường: kim phụ mờ, ngắn hơn kim chính
+	#  - Sắp có gust / gió đổi mạnh: kim phụ LỆCH khỏi kim chính, VỌT dài ra và đổi màu cảnh báo
+	#  - Khi kim chính đuổi kịp (gap nhỏ lại) thì kim phụ co về và mờ đi
 	if ghost_needle != null:
+		var predicted_intensity: float = clampf(absf(target_predicted_wind) / max_wind_range, 0.0, 1.0)
+		var lead_gap: float = clampf(absf(target_predicted_wind - current_wind) / max_wind_range, 0.0, 1.0)
+		var target_len: float = lerpf(needle_min_length, needle_max_length, maxf(predicted_intensity, lead_gap * 1.25))
+		smooth_ghost_length = lerpf(smooth_ghost_length, target_len, clampf(ghost_jump_speed + delta * 4.0, 0.0, 1.0))
+
 		ghost_needle.rotation = smooth_ghost_angle
-		ghost_needle.scale = Vector2(art_scale, art_scale * ghost_length_factor)
-		ghost_needle.modulate = ghost_color
+		ghost_needle.scale = Vector2(art_scale, art_scale * smooth_ghost_length)
+		ghost_needle.modulate = ghost_warning_color if lead_gap > gust_alert_threshold else ghost_color
 
 # Màu kim theo cường độ gió: Xanh lá (<60) -> Vàng (60-140) -> Đỏ (>140)
 func needle_color(wind_abs: float) -> Color:

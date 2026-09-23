@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://diqir2pjtdg5e"]
+
+[ext_resource type="PackedScene" uid="uid://dnsqstjbtt2ov" path="res://nodes/game/world/fx/vfx.tscn" id="1_vfx"]
+[ext_resource type="SpriteFrames" uid="uid://dkfnjvnxkse5y" path="res://resources/animations/hit_burst_frames.tres" id="2_frames"]
+
+[node name="ShieldBreakVfx" unique_id=873024702 instance=ExtResource("1_vfx")]
+modulate = Color(0.5, 0.95, 1, 1)
+z_index = 20
+sprite_frames = ExtResource("2_frames")
+animation = &"burst"
+hide_when_done = false
+auto_free = true
+randomize_rotation = true
+randomize_scale = true

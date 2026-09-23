@@ -92,35 +92,38 @@ func spawn_level_obstacles(level: BaseLevel) -> void:
 			continue
 		spawn_obstacle(marker.obstacle_scene, marker.build_params(), container)
 
-# Sinh vật phẩm (Coins, Shield Bubble, Backup Chute) theo cấu trúc màn chơi (Update_Feature.md Section 1)
+# Sinh vật phẩm (Coins, Shield Bubble, Backup Chute) theo tần suất khai báo trong Level scene
+# (Update_Feature.md 1.4: Coin thường xuyên, Shield trung bình, Backup hiếm)
 func spawn_level_items(level: BaseLevel) -> void:
 	clear_all_items()
 	if level == null:
 		return
-		
-	var target_y = level.ground_y
-	var host = world_node if (world_node != null and world_node.is_inside_tree()) else self
-	
-	# 1. Sinh các chuỗi đồng xu vàng (Coin clusters / arcs)
-	# Chuỗi 1: Cụm cong nhẹ ở độ cao tầng trên (220 - 320px)
-	var coin_start_x = randf_range(160.0, 220.0)
-	for c in range(4):
-		var cp = Vector2(coin_start_x + float(c) * 35.0, 240.0 + sin(float(c) * 0.8) * 20.0)
-		spawn_item(ITEM_COIN_SCENE, cp, host)
-		
-	# Chuỗi 2: Cụm đồng xu ở độ cao tầng giữa (440 - 520px)
-	var coin_start_x2 = randf_range(260.0, 320.0)
-	for c in range(4):
-		var cp = Vector2(coin_start_x2 - float(c) * 35.0, 480.0 + cos(float(c) * 0.7) * 20.0)
-		spawn_item(ITEM_COIN_SCENE, cp, host)
 
-	# 2. Sinh Khiên bảo vệ Shield Bubble (xuất hiện hơi lệch tâm buộc người chơi phải điều khiển né sang nhặt - GDD 6.5)
-	var shield_x = 120.0 if randf() < 0.5 else 420.0
-	spawn_item(ITEM_SHIELD_SCENE, Vector2(shield_x, 380.0), host)
-	
-	# 3. Sinh Dù cứu viện Backup Chute (Hiếm - đặt ở tầng cao 580 - 640px)
-	var backup_x = randf_range(180.0, 360.0)
-	spawn_item(ITEM_BACKUP_SCENE, Vector2(backup_x, 620.0), host)
+	var host = world_node if (world_node != null and world_node.is_inside_tree()) else self
+
+	# 1. Các cụm coin uốn theo vòng cung (Update_Feature.md 6.5: xếp hình để khuyến khích lái theo quỹ đạo)
+	var cluster_count: int = maxi(0, level.coin_cluster_count)
+	var per_cluster: int = maxi(0, level.coins_per_cluster)
+	for cluster in cluster_count:
+		var start_x: float = randf_range(140.0, 400.0)
+		var base_line_y: float = 230.0 + float(cluster) * 240.0
+		var dir_sign: float = 1.0 if cluster % 2 == 0 else -1.0
+		for c in per_cluster:
+			var t: float = float(c) / float(maxi(1, per_cluster - 1))
+			var cp := Vector2(
+				clampf(start_x + dir_sign * (t - 0.5) * 140.0, 40.0, 500.0),
+				base_line_y + sin(t * PI) * 26.0
+			)
+			spawn_item(ITEM_COIN_SCENE, cp, host)
+
+	# 2. Shield Bubble: đặt lệch khỏi đường rơi tự nhiên để người chơi phải đánh đổi quỹ đạo (6.5)
+	for i in maxi(0, level.shield_item_count):
+		var shield_x: float = 110.0 if i % 2 == 0 else 430.0
+		spawn_item(ITEM_SHIELD_SCENE, Vector2(shield_x, 360.0 + float(i) * 180.0), host)
+
+	# 3. Backup Chute: hiếm, đặt ở tầng cao gần mặt đất
+	for i in maxi(0, level.backup_item_count):
+		spawn_item(ITEM_BACKUP_SCENE, Vector2(randf_range(160.0, 380.0), 600.0 + float(i) * 80.0), host)
 
 # Kiểm tra tương tác Troop <-> Obstacles & Items mỗi frame
 func check_troop_interactions(troop: Troop, delta: float) -> void:

@@ -15,6 +15,11 @@ const BASE_DAMPING: float = 3.5
 const MAX_DAMPING_MULTIPLIER: float = 1.8
 # SVG gốc được vẽ ở tỉ lệ 2x -> scale 0.5 để khớp kích thước thiết kế (30x38 px)
 const SPRITE_SCALE: Vector2 = Vector2(0.5, 0.5)
+const LEAD_MARKER_SCALE: Vector2 = Vector2(0.5, 0.5)
+const SHIELD_AURA_SCALE: Vector2 = Vector2(0.5, 0.5)
+const PRIORITY_STAR_SCALE: Vector2 = Vector2(0.5, 0.5)
+# Màu dù của nhân vật ưu tiên (Update_Feature.md 6.1)
+const PRIORITY_COLOR: Color = Color(1.0, 0.82, 0.15)
 
 # Bảng màu dù/khăn phân biệt các nhân vật theo thứ tự thả (Update_Feature.md 6.2)
 const TROOP_COLORS: Array[Color] = [
@@ -30,6 +35,9 @@ const TROOP_COLORS: Array[Color] = [
 @onready var parachute_sprite: Sprite2D = $Parachute
 @onready var scarf_line: Line2D = $Scarf
 @onready var trail_line: Line2D = $Trail
+@onready var lead_marker: Sprite2D = $LeadMarker
+@onready var shield_aura: Sprite2D = $ShieldAura
+@onready var priority_star: Sprite2D = $PriorityStar
 
 # Biến trạng thái
 var fall_time: float = 0.0
@@ -56,6 +64,11 @@ var is_lead_troop: bool = false
 var troop_color_index: int = 0
 var anim_pulse_time: float = 0.0
 
+# Trọng lượng riêng (Update_Feature.md 6.1): nặng -> rơi nhanh, ít bị tilt/gió đẩy
+var weight_multiplier: float = 1.0
+# Nhân vật ưu tiên (hiếm): đáp trúng hồng tâm được điểm gấp đôi (Update_Feature.md 6.1)
+var is_priority: bool = false
+
 # Visual & trail
 var trail_points: Array[Vector2] = []
 var max_trail_points: int = 18
@@ -76,7 +89,7 @@ func _ready() -> void:
 	z_index = 10
 	_sync_visuals()
 
-func init_troop(drop_pos: Vector2, target_ground_y: float, color_idx: int = 0) -> void:
+func init_troop(drop_pos: Vector2, target_ground_y: float, color_idx: int = 0, priority: bool = false) -> void:
 	position = drop_pos
 	start_y = drop_pos.y
 	ground_y = target_ground_y
@@ -98,32 +111,45 @@ func init_troop(drop_pos: Vector2, target_ground_y: float, color_idx: int = 0) -
 	has_shield = false
 	invulnerable_timer = 0.0
 	is_lead_troop = false
+	is_priority = priority
+	# Trọng lượng random nhẹ mỗi lượt thả để phản ứng tilt/gió có biến thiên tự nhiên (6.1)
+	weight_multiplier = randf_range(0.9, 1.12)
 	set_troop_color(color_idx)
 	if body_sprite != null:
 		body_sprite.rotation = 0.0
 		body_sprite.modulate = Color.WHITE
 	_sync_visuals()
-	queue_redraw()
 
+# Màu dù/khăn riêng theo thứ tự thả (Update_Feature.md 6.2); nhân vật ưu tiên luôn màu vàng (6.1)
 func set_troop_color(color_idx: int) -> void:
 	troop_color_index = posmod(color_idx, TROOP_COLORS.size())
-	var col = TROOP_COLORS[troop_color_index]
+	_apply_visual_color()
+
+func mark_as_priority(priority: bool) -> void:
+	is_priority = priority
+	_apply_visual_color()
+	_sync_visuals()
+
+func _apply_visual_color() -> void:
+	var col: Color = PRIORITY_COLOR if is_priority else TROOP_COLORS[troop_color_index]
 	if parachute_sprite != null:
 		parachute_sprite.modulate = col
 	if scarf_line != null:
 		scarf_line.default_color = Color(col.r, col.g, col.b, 0.9)
+	if priority_star != null:
+		priority_star.visible = is_priority and not has_landed and not is_knocked_out
 
 func grant_shield() -> void:
 	has_shield = true
 	shield_granted.emit()
-	queue_redraw()
+	_sync_visuals()
 
 func break_shield() -> void:
 	has_shield = false
 	invulnerable_timer = 0.6 # Miễn nhiễm va chạm 0.6s sau khi vỡ khiên
 	shield_broken.emit()
 	_flash_shield_break()
-	queue_redraw()
+	_sync_visuals()
 
 func _flash_shield_break() -> void:
 	if body_sprite != null:
@@ -168,8 +194,8 @@ func _physics_process(delta: float) -> void:
 
 	fall_time += delta
 	
-	# 1. Rơi theo chiều dọc (Y-axis) có tính đến Easing 0.3s đầu và Zone effects (Updraft / Thin Air)
-	var effective_gravity = GRAVITY * zone_gravity_multiplier - zone_updraft_lift
+	# 1. Rơi theo chiều dọc (Y-axis) có tính đến Easing 0.3s đầu, Trọng lượng (6.1) và Zone effects
+	var effective_gravity = GRAVITY * weight_multiplier * zone_gravity_multiplier - zone_updraft_lift
 	if fall_time < 0.3:
 		var t_ratio = fall_time / 0.3
 		var ease_out = 1.0 - (1.0 - t_ratio) * (1.0 - t_ratio)
@@ -188,7 +214,7 @@ func _physics_process(delta: float) -> void:
 	var current_fall_progress: float = clamp((position.y - start_y) / total_fall_distance, 0.0, 1.0)
 	var current_damping: float = lerp(BASE_DAMPING, BASE_DAMPING * MAX_DAMPING_MULTIPLIER, current_fall_progress)
 	
-	var target_vx: float = total_force_x
+	var target_vx: float = total_force_x / weight_multiplier
 	var exp_factor: float = 1.0 - exp(-current_damping * delta)
 	velocity.x += (target_vx - velocity.x) * exp_factor
 	velocity.x = clamp(velocity.x, -MAX_HORIZONTAL_SPEED, MAX_HORIZONTAL_SPEED)
@@ -217,7 +243,6 @@ func _physics_process(delta: float) -> void:
 	anim_pulse_time += delta
 	if invulnerable_timer > 0.0:
 		invulnerable_timer -= delta
-	queue_redraw()
 
 	# Kiểm tra chạm đất
 	if position.y >= ground_y:
@@ -233,7 +258,7 @@ func _trigger_landing() -> void:
 	is_squashing = true
 	squash_timer = 0.0
 	landed.emit(position)
-	queue_redraw()
+	_sync_visuals()
 
 func _process_squash(delta: float) -> void:
 	squash_timer += delta
@@ -261,7 +286,9 @@ func on_obstacle_entered(obstacle: Node2D) -> void:
 	if has_shield:
 		break_shield()
 		return
-		
+
+	# Hiệu ứng va chạm do chính actor phát (cấu hình Vfx khai báo trong troop.tscn)
+	play_vfx()
 	overlapping_obstacle = obstacle
 	hit_obstacle.emit(obstacle)
 	overlapping_obstacle = null
@@ -303,7 +330,6 @@ func _process_knockout(delta: float) -> void:
 		is_knocked_out = false
 
 	_sync_visuals()
-
 # Chớp đỏ khi trúng đòn (phản hồi trực quan rõ ràng)
 func _flash_hit() -> void:
 	if body_sprite != null:
@@ -322,6 +348,9 @@ func _sync_visuals() -> void:
 		for p in trail_points:
 			pts.append(trail_line.to_local(p))
 		trail_line.points = pts
+		# Vệt đậm dần khi gần chạm đất (Update_Feature.md 6.2)
+		var progress: float = clampf((position.y - start_y) / total_fall_distance, 0.0, 1.0)
+		trail_line.self_modulate.a = lerpf(0.5, 1.0, progress)
 
 	# 2. Khăn quàng bay theo gió (Wind Scarf)
 	if scarf_line != null:
@@ -338,27 +367,28 @@ func _sync_visuals() -> void:
 	if body_sprite != null:
 		body_sprite.scale = SPRITE_SCALE * squash_stretch
 
-func _draw() -> void:
-	# 1. Vẽ Vòng hào quang Lead Troop (Update_Feature.md 3.2: highlight nhân vật gần đất nhất)
-	if is_lead_troop and not has_landed and not is_knocked_out:
-		var pulse_scale = 1.0 + sin(anim_pulse_time * 6.0) * 0.12
-		var ring_alpha = 0.55 + sin(anim_pulse_time * 6.0) * 0.25
-		draw_arc(Vector2(0, 10.0), 16.0 * pulse_scale, 0.0, TAU, 24, Color(1.0, 0.85, 0.2, ring_alpha), 2.0)
-		# Mũi tên chỉ thị nhỏ
-		var arrow_y = -35.0 + sin(anim_pulse_time * 6.0) * 3.0
-		var arrow_pts: PackedVector2Array = PackedVector2Array([
-			Vector2(-4, arrow_y - 6),
-			Vector2(4, arrow_y - 6),
-			Vector2(0, arrow_y)
-		])
-		draw_colored_polygon(arrow_pts, Color(1.0, 0.85, 0.2, ring_alpha))
+	# 5. Vòng highlight nhân vật dẫn đầu (Update_Feature.md 3.2) - node Sprite2D khai báo trong troop.tscn
+	if lead_marker != null:
+		var show_lead: bool = is_lead_troop and not has_landed and not is_knocked_out
+		lead_marker.visible = show_lead
+		if show_lead:
+			var lead_pulse: float = 1.0 + sin(anim_pulse_time * 6.0) * 0.10
+			lead_marker.scale = LEAD_MARKER_SCALE * lead_pulse
+			lead_marker.modulate = Color(1, 1, 1, 0.7 + sin(anim_pulse_time * 6.0) * 0.3)
 
-	# 2. Vẽ Bong bóng khiên Shield Bubble (Update_Feature.md 1.2)
-	if has_shield and not has_landed and not is_knocked_out:
-		var bubble_pulse = 1.0 + sin(anim_pulse_time * 4.0) * 0.06
-		var bubble_radius = 24.0 * bubble_pulse
-		var bubble_col = Color(0.25, 0.85, 1.0, 0.35 + sin(anim_pulse_time * 5.0) * 0.1)
-		draw_circle(Vector2(0, -6.0), bubble_radius, bubble_col)
-		draw_arc(Vector2(0, -6.0), bubble_radius, 0.0, TAU, 28, Color(0.6, 0.95, 1.0, 0.8), 2.0)
-		# Điểm phản quang trên quả cầu khiên
-		draw_circle(Vector2(-7.0, -14.0), 3.5, Color(1.0, 1.0, 1.0, 0.65))
+	# 6. Bong bóng khiên Shield Bubble (Update_Feature.md 1.2)
+	if shield_aura != null:
+		var show_shield: bool = has_shield and not has_landed and not is_knocked_out
+		shield_aura.visible = show_shield
+		if show_shield:
+			var shield_pulse: float = 1.0 + sin(anim_pulse_time * 4.0) * 0.06
+			shield_aura.scale = SHIELD_AURA_SCALE * shield_pulse
+
+	# 7. Ngôi sao đánh dấu nhân vật ưu tiên (Update_Feature.md 6.1)
+	if priority_star != null:
+		var show_star: bool = is_priority and not has_landed and not is_knocked_out
+		priority_star.visible = show_star
+		if show_star:
+			var star_pulse: float = 1.0 + sin(anim_pulse_time * 5.0) * 0.12
+			priority_star.scale = PRIORITY_STAR_SCALE * star_pulse
+			priority_star.rotation = sin(anim_pulse_time * 2.0) * 0.25

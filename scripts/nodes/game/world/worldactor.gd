@@ -1,8 +1,10 @@
 # Actor cơ sở (Base World Actor)
-# Cung cấp sẵn 2 node cho mọi lớp con:
+# Cung cấp sẵn 3 node cho mọi lớp con:
 #   - Sprite    (AnimatedSprite2D): hiển thị hoạt ảnh, frame lấy từ resources/animations
 #   - Collision (CollisionShape2D): hitbox vật lý, SpawnerController phát hiện va chạm
 #     thông qua Area2D (WorldActor kế thừa Area2D) + Troop.get_overlapping_areas()
+#   - Vfx       (nodes/vfx/vfx.tscn): hiệu ứng dùng chung, mỗi actor scene tự khai báo
+#     SpriteFrames/animation cho Vfx này (xem troop.tscn) - actor chỉ gọi play_vfx()
 class_name WorldActor
 extends Area2D
 
@@ -33,3 +35,29 @@ func play_animation(anim: StringName) -> void:
 	var sprite := get_sprite()
 	if sprite != null and sprite.sprite_frames != null and sprite.sprite_frames.has_animation(anim):
 		sprite.play(anim)
+
+# ============================================================
+# VFX dùng chung (khai báo sẵn trong world_actor.tscn, thông số đặt trong scene)
+# ============================================================
+
+# Node VFX của actor (null nếu scene con chưa khai báo)
+func get_vfx() -> Vfx:
+	return get_node_or_null("Vfx") as Vfx
+
+# Phát VFX của actor tại chính vị trí actor (animation/frame do scene khai báo)
+func play_vfx() -> void:
+	var vfx := get_vfx()
+	if vfx != null:
+		vfx.play()
+
+# Phát VFX của actor lệch một khoảng local (ví dụ trên đầu nhân vật)
+func play_vfx_at_offset(local_offset: Vector2) -> void:
+	var vfx := get_vfx()
+	if vfx != null:
+		vfx.position = local_offset
+		vfx.play()
+
+func stop_vfx() -> void:
+	var vfx := get_vfx()
+	if vfx != null:
+		vfx.stop()

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -40 60 60" width="120" height="120">
+  <!-- SHIELD AURA quanh nhân vật khi đang có khiên (Update_Feature.md 1.2)
+       Vẽ ở 2x: Sprite dùng offset (-60,-80) + scale 0.5 -->
+  <circle cx="0" cy="-6" r="26" fill="#4de6ff" fill-opacity="0.3" />
+  <circle cx="0" cy="-6" r="26" fill="none" stroke="#b3f5ff" stroke-width="2.5" stroke-opacity="0.9" />
+  <circle cx="-7" cy="-14" r="3.5" fill="#ffffff" fill-opacity="0.65" />
+  <polygon points="-7,-13 7,-13 7,-7 0,2 -7,-7" fill="#ffffff" fill-opacity="0.55" />
+</svg>

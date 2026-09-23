@@ -12,8 +12,9 @@ signal individual_troop_shield_broken(troop: Troop)
 @export var camera: Camera2D
 @export var spawner_controller: SpawnerController
 
-# Scene hiệu ứng nổ khi va chạm - đổi được trong Inspector nếu muốn art khác
-@export var hit_effect_scene: PackedScene = preload("res://nodes/game/world/fx/hit_effect.tscn")
+# Scene VFX spawn rời (kế thừa nodes/vfx/vfx.tscn) - gán trong game.tscn
+@export var shield_break_vfx_scene: PackedScene
+@export var pickup_vfx_scene: PackedScene
 const TROOP_SCENE: PackedScene = preload("res://nodes/game/world/player/troop.tscn")
 
 var active_troop: Troop = null # Troop dẫn đầu (gần đất nhất)
@@ -23,10 +24,25 @@ var current_level: BaseLevel = null
 
 const DROP_START_POS: Vector2 = Vector2(270.0, 90.0)
 const DEFAULT_GROUND_Y: float = 840.0
+# Tỉ lệ xuất hiện nhân vật ưu tiên (hiếm) - Update_Feature.md 6.1
+const PRIORITY_TROOP_CHANCE: float = 0.12
+# Update_Feature.md 6.6: zoom out nhẹ khi nhiều nhân vật cùng rơi để thấy cả người vừa thả và người gần đất
+const ZOOM_SINGLE: float = 1.0
+const ZOOM_TWO_TROOPS: float = 0.94
+const ZOOM_MANY_TROOPS: float = 0.88
+const ZOOM_LERP_SPEED: float = 0.10
+# Cú "punch" zoom khi tiếp đất (GDD 7.4) - nhân vào zoom khung hình chứ không thay thế
+const ZOOM_PUNCH_AMOUNT: float = 0.12
 var ground_y: float = DEFAULT_GROUND_Y
+var _zoom_punch: float = 0.0
+var _zoom_tween: Tween = null
 
 func _ready() -> void:
 	_ensure_world_elements()
+
+func _process(_delta: float) -> void:
+	# Zoom khung hình mỗi frame: zoom out theo số nhân vật đang rơi (§6.6) x cú punch khi tiếp đất (GDD 7.4)
+	_apply_framing_zoom()
 
 func _ensure_world_elements() -> void:
 	if world_node == null:
@@ -95,14 +111,15 @@ func spawn_continuous_troop(spawn_x: float, color_idx: int) -> Troop:
 	_bind_troop_signals(troop)
 	
 	var drop_pos = Vector2(spawn_x, DROP_START_POS.y)
-	troop.init_troop(drop_pos, ground_y, color_idx)
+	# Nhân vật ưu tiên (hiếm): dù màu vàng + đáp trúng hồng tâm được điểm gấp đôi (Update_Feature.md 6.1)
+	var is_priority: bool = randf() < PRIORITY_TROOP_CHANCE
+	troop.init_troop(drop_pos, ground_y, color_idx, is_priority)
 	troop.start_drop()
 	active_troops.append(troop)
 	# Nhân vật vừa thả đảm nhận vai trò dẫn đầu nếu chưa có ai
 	if active_troop == null or not is_instance_valid(active_troop):
 		active_troop = troop
 	return troop
-
 # Cao độ nhân vật dẫn đầu (dùng để tính gió theo độ cao; chưa có thì lấy điểm thả)
 func get_lead_y() -> float:
 	if active_troop != null and is_instance_valid(active_troop):
@@ -112,6 +129,9 @@ func get_lead_y() -> float:
 # Chuẩn bị cho lượt đầu tiên
 func prepare_troop_for_drop() -> void:
 	clear_all_troops()
+	if _zoom_tween != null and _zoom_tween.is_valid():
+		_zoom_tween.kill()
+	_zoom_punch = 0.0
 	if camera:
 		camera.position = Vector2(270.0, 480.0)
 		camera.offset = Vector2.ZERO
@@ -156,16 +176,36 @@ func update_troop_forces(tilt_force: float, wind_force: float, delta: float = 0.
 		var target_cam_y = clamp(lead.position.y + 120.0, 480.0, ground_y - 240.0)
 		camera.position.y = lerp(camera.position.y, target_cam_y, 0.08)
 
+# Zoom out nhẹ khi có nhiều nhân vật cùng tồn tại để không cắt mất nhân vật vừa thả (Update_Feature.md 6.6)
+func _apply_framing_zoom() -> void:
+	if camera == null:
+		return
+	var airborne: int = get_airborne_count()
+	var framing: float = ZOOM_SINGLE
+	if airborne >= 3:
+		framing = ZOOM_MANY_TROOPS
+	elif airborne == 2:
+		framing = ZOOM_TWO_TROOPS
+	var target_zoom: float = framing * (1.0 + ZOOM_PUNCH_AMOUNT * _zoom_punch)
+	camera.zoom = camera.zoom.lerp(Vector2(target_zoom, target_zoom), ZOOM_LERP_SPEED)
+
+# Nhịp "punch" khi nhân vật chạm đất
+func _play_landing_zoom_punch() -> void:
+	if _zoom_tween != null and _zoom_tween.is_valid():
+		_zoom_tween.kill()
+	_zoom_punch = 0.0
+	_zoom_tween = create_tween()
+	_zoom_tween.tween_property(self, "_zoom_punch", 1.0, 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	_zoom_tween.tween_interval(0.6)
+	_zoom_tween.tween_property(self, "_zoom_punch", 0.0, 0.3)
+
 func _on_troop_landed_handler(troop: Troop, pos: Vector2) -> void:
 	individual_troop_landed.emit(troop, pos)
 	troop_landed.emit(pos)
 	
 	# Zoom nhẹ camera vào khoảnh khắc chạm đất (GDD 7.4)
 	if camera:
-		var tw = create_tween()
-		tw.tween_property(camera, "zoom", Vector2(1.12, 1.12), 0.25).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-		tw.tween_interval(0.6)
-		tw.tween_property(camera, "zoom", Vector2.ONE, 0.3)
+		_play_landing_zoom_punch()
 
 func _on_troop_hit_obstacle_handler(troop: Troop, obs: Node2D) -> void:
 	individual_troop_hit_obstacle.emit(troop, obs)
@@ -174,18 +214,28 @@ func _on_troop_hit_obstacle_handler(troop: Troop, obs: Node2D) -> void:
 func _on_troop_shield_broken_handler(troop: Troop) -> void:
 	individual_troop_shield_broken.emit(troop)
 
-# Phản hồi khi lính đụng chướng ngại vật: hiệu ứng nổ + rung camera
-func play_hit_feedback(hit_pos: Vector2) -> void:
-	if world_node == null:
-		return
-
-	if hit_effect_scene != null:
-		var fx := hit_effect_scene.instantiate() as HitEffect
-		if fx != null:
-			world_node.add_child(fx)
-			fx.play_at(hit_pos)
-
+# Phản hồi khi lính đụng chướng ngại vật (hiệu ứng nổ do chính Troop phát qua play_vfx())
+func play_hit_feedback(_hit_pos: Vector2) -> void:
 	_shake_camera()
+
+# Sinh một VFX rời (scene kế thừa từ nodes/vfx/vfx.tscn) tại vị trí trong world
+func spawn_vfx(scene: PackedScene, world_pos: Vector2) -> Vfx:
+	if scene == null or world_node == null:
+		return null
+	var vfx := scene.instantiate() as Vfx
+	if vfx == null:
+		return null
+	world_node.add_child(vfx)
+	vfx.play_at(world_pos)
+	return vfx
+
+# VFX khi khiên bảo vệ đỡ đòn (preset khai báo qua export trong game.tscn)
+func play_shield_break_fx(world_pos: Vector2) -> void:
+	spawn_vfx(shield_break_vfx_scene, world_pos)
+
+# VFX khi nhặt vật phẩm (coin/shield/backup)
+func play_pickup_fx(world_pos: Vector2) -> void:
+	spawn_vfx(pickup_vfx_scene, world_pos)
 
 # Rung camera ngắn khi va chạm (giảm dần biên độ)
 func _shake_camera(duration: float = 0.32, magnitude: float = 14.0) -> void:

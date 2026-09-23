@@ -79,6 +79,15 @@ func add_reinforcement(amount: int = 1) -> void:
 		total_troops += amount
 		troop_count_changed.emit(current_troop_index, total_troops)
 
+# Cộng điểm thưởng ngoài phần điểm hạ cánh: nhân vật ưu tiên (6.1), multi-catch bonus (6.3)
+func add_bonus_points(amount: int) -> void:
+	if amount == 0:
+		return
+	current_score += amount
+	if current_score > high_score:
+		high_score = current_score
+	score_changed.emit(current_score, target_score, combo_multiplier)
+
 func add_landing_score(points: int, distance: float, ring_name: String) -> int:
 	var final_points: int = points
 	

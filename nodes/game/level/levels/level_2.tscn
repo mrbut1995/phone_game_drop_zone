@@ -9,8 +9,8 @@ level_number = 2
 level_name = "Màn 2: Gió Tạt Ngang"
 total_troops = 5
 target_score = 320
-base_wind_min = -90.0
-base_wind_max = 90.0
+base_wind_min = -60.0
+base_wind_max = 60.0
 gust_interval = 5.5
 
 [node name="Background" parent="." index="0"]

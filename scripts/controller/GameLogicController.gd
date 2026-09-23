@@ -34,12 +34,20 @@ var last_reported_sec: int = -1
 const SPAWN_INTERVAL: float = 1.2          # thời gian giữa 2 lần thả liên tiếp
 const MAX_CONCURRENT_TROOPS: int = 4       # số nhân vật tối đa cùng lúc trên màn hình
 const SPAWN_ZIGZAG_OFFSET: float = 60.0    # lệch trái/phải xen kẽ để không chồng cột
+# Giới hạn động (Update_Feature.md 6.3): màn hình đã đông thì giãn nhịp thả ra cho đỡ dồn ép
+const PRESSURE_AIRBORNE_THRESHOLD: int = 3
+const PRESSURE_INTERVAL_MULTIPLIER: float = 1.35
+# Multi-catch bonus (Update_Feature.md 6.3): nhiều nhân vật đáp điểm cao trong thời gian ngắn
+const MULTI_CATCH_WINDOW: float = 0.75
+const MULTI_CATCH_MIN_HIGH_LANDINGS: int = 2
+const MULTI_CATCH_BONUS: int = 50
 
 var _spawn_budget: int = 0                 # số lính còn được thả (-1 = vô hạn: Endless/Practice)
 var _spawned_count: int = 0
 var _resolved_count: int = 0               # số lính đã kết thúc lượt (hạ cánh hoặc trúng đòn)
 var _spawn_timer: float = 0.0
 var _is_dropping: bool = false
+var _recent_high_landings: Array[float] = []  # mốc thời gian các cú đáp điểm cao (multi-catch)
 
 func _ready() -> void:
 	game_state = GameState.new()
@@ -83,6 +91,7 @@ func start_troop_round() -> void:
 	_resolved_count = 0
 	_spawn_timer = 0.0
 	_is_dropping = false
+	_recent_high_landings.clear()
 
 	countdown_timer = 3.0
 	is_counting_down = true
@@ -159,10 +168,16 @@ func _update_continuous_spawn(delta: float) -> void:
 	if _spawn_timer > 0.0:
 		return
 	# Đã đạt giới hạn số nhân vật cùng lúc -> hoãn spawn cho tới khi có người chạm đất
-	if world_ctrl.get_airborne_count() >= MAX_CONCURRENT_TROOPS:
+	var airborne: int = world_ctrl.get_airborne_count()
+	if airborne >= MAX_CONCURRENT_TROOPS:
 		return
 	_spawn_troop()
-	_spawn_timer = SPAWN_INTERVAL
+
+	# Giới hạn động (6.3): đang có nhiều nhân vật trên không thì thả chậm lại một chút
+	var interval: float = SPAWN_INTERVAL
+	if airborne >= PRESSURE_AIRBORNE_THRESHOLD:
+		interval *= PRESSURE_INTERVAL_MULTIPLIER
+	_spawn_timer = interval
 
 # Thả 1 nhân vật với vị trí lệch xen kẽ (zigzag) để tránh chồng thẳng cột
 func _spawn_troop() -> void:
@@ -221,6 +236,37 @@ func _on_world_troop_landed(troop: Troop, land_pos: Vector2) -> void:
 	var final_points = game_state.add_landing_score(points, dist, ring_name)
 	landing_eval["final_points"] = final_points
 	landing_eval["multiplier"] = game_state.combo_multiplier
+
+	# Nhân vật ưu tiên (⭐ dù vàng): đáp TRÚNG TÂM được điểm gấp đôi (Update_Feature.md 6.1)
+	if troop.is_priority and points >= 100:
+		game_state.add_bonus_points(final_points)
+		final_points *= 2
+		landing_eval["ring_name"] = "%s ⭐x2" % ring_name
+
+	# Multi-catch bonus: 2+ nhân vật đáp điểm cao trong thời gian rất ngắn (Update_Feature.md 6.3)
+	var now: float = float(Time.get_ticks_msec()) / 1000.0
+	if points >= 70:
+		var recent: Array[float] = []
+		for t in _recent_high_landings:
+			if now - t <= MULTI_CATCH_WINDOW:
+				recent.append(t)
+		recent.append(now)
+		_recent_high_landings = recent
+		if _recent_high_landings.size() >= MULTI_CATCH_MIN_HIGH_LANDINGS:
+			game_state.add_bonus_points(MULTI_CATCH_BONUS)
+			final_points += MULTI_CATCH_BONUS
+			world_ctrl.spawn_floating_score({
+				"text": "MULTI-CATCH! +%d" % MULTI_CATCH_BONUS,
+				"points": MULTI_CATCH_BONUS,
+				"color": Color(1.0, 0.9, 0.3)
+			}, land_pos + Vector2(0.0, -44.0))
+
+	landing_eval["final_points"] = final_points
+	# Chữ nổi hiển thị đúng số điểm cuối cùng (đã gồm x2 / bonus)
+	var floating_text: String = "+%d %s" % [final_points, landing_eval["ring_name"]]
+	if game_state.combo_multiplier > 1:
+		floating_text += "\nCOMBO x%d!" % game_state.combo_multiplier
+	landing_eval["text"] = floating_text
 	
 	# Hiệu ứng nổi chữ điểm số tại vị trí chạm đất
 	world_ctrl.spawn_floating_score(landing_eval, land_pos)
@@ -276,6 +322,7 @@ func _on_world_troop_hit_obstacle(troop: Troop, obs: Node2D) -> void:
 func _on_world_troop_shield_broken(troop: Troop) -> void:
 	if troop == null:
 		return
+	world_ctrl.play_shield_break_fx(troop.position)
 	world_ctrl.spawn_floating_score({
 		"text": "🛡 KHIÊN ĐỠ ĐƠN!",
 		"points": 0,
@@ -286,6 +333,9 @@ func _on_world_troop_shield_broken(troop: Troop) -> void:
 
 # Nhặt vật phẩm: Coin / Shield Bubble / Backup Chute (Update_Feature.md Section 1)
 func _on_item_collected(item_type: Item.ItemType, troop: Troop, world_pos: Vector2) -> void:
+	# VFX nhặt vật phẩm (preset VFX rời khai báo trong game.tscn)
+	world_ctrl.play_pickup_fx(world_pos)
+
 	match item_type:
 		Item.ItemType.COIN:
 			game_state.add_coins(1)

@@ -1,6 +1,6 @@
-[gd_resource type="SpriteFrames" load_steps=6 format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://sopw1gdmbe53"]
 
-[ext_resource type="Texture2D" path="res://assets/images/placeholder/backup_chute_spritesheet.svg" id="1_h51d6"]
+[ext_resource type="Texture2D" uid="uid://7fxl5wr3psld" path="res://assets/images/placeholder/backup_chute_spritesheet.svg" id="1_h51d6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yw52a"]
 atlas = ExtResource("1_h51d6")
@@ -33,7 +33,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_opmdu")
 }],
-"loop": true,
+"loop": 1,
 "name": &"bob",
 "speed": 6.0
 }]

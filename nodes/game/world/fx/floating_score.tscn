@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/nodes/game/world/fx/floating_score.gd" id="1_score"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_normal"]
+font_size = 16
+outline_size = 4
+outline_color = Color(0, 0, 0, 0.55)
+
+[sub_resource type="LabelSettings" id="LabelSettings_big"]
+font_size = 22
+outline_size = 5
+outline_color = Color(0, 0, 0, 0.6)
+
+[node name="FloatingScore" type="Node2D"]
+z_index = 25
+script = ExtResource("1_score")
+label_settings_normal = SubResource("LabelSettings_normal")
+label_settings_big = SubResource("LabelSettings_big")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -120.0
+offset_top = -50.0
+offset_right = 120.0
+offset_bottom = 0.0
+mouse_filter = 2
+label_settings = SubResource("LabelSettings_normal")
+text = "+0"
+horizontal_alignment = 1
+vertical_alignment = 1

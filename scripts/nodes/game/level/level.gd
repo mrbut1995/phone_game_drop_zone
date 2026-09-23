@@ -15,11 +15,20 @@ extends Node2D
 @export var target_score: int = 280
 
 @export_group("Gió")
-@export var base_wind_min: float = -40.0
-@export var base_wind_max: float = 40.0
+# Lưu ý: vì GRAVITY/MAX_FALL_SPEED đã giảm (Update_Feature.md mục 4) nên thời gian rơi dài hơn
+# -> biên độ gió được hạ nhẹ để độ khó không tăng đột biến (Update_Feature.md 4.2)
+@export var base_wind_min: float = -30.0
+@export var base_wind_max: float = 30.0
 @export var gust_interval: float = 8.0
-@export var gust_strength_min: float = 120.0
-@export var gust_strength_max: float = 240.0
+@export var gust_strength_min: float = 90.0
+@export var gust_strength_max: float = 180.0
+
+@export_group("Vật phẩm (Items)")
+# Tần suất xuất hiện theo màn (Update_Feature.md 1.4): Coin thường xuyên, Shield trung bình, Backup hiếm
+@export var coin_cluster_count: int = 2      # số cụm coin rải trên đường rơi
+@export var coins_per_cluster: int = 4       # số coin mỗi cụm (cụm uốn theo vòng cung)
+@export var shield_item_count: int = 1       # số Shield Bubble (lệch khỏi đường rơi để phải chọn)
+@export var backup_item_count: int = 1       # số Backup Chute (hiếm, tầng cao)
 
 @export_group("Bia mục tiêu")
 @export var target_moving: bool = false

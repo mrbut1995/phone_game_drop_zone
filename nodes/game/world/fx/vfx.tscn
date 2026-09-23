@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://dnsqstjbtt2ov"]
+
+[ext_resource type="Script" path="res://scripts/nodes/vfx/vfx.gd" id="1_vfx"]
+
+[node name="Vfx" type="Node2D" unique_id=873024702]
+z_index = 15
+script = ExtResource("1_vfx")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+
+[connection signal="animation_finished" from="Sprite" to="." method="_on_sprite_animation_finished"]

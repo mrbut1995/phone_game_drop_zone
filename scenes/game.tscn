@@ -16,6 +16,9 @@
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_4.tscn" id="16_lvl4"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_5.tscn" id="17_lvl5"]
 [ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_6.tscn" id="18_lvl6"]
+[ext_resource type="PackedScene" path="res://nodes/game/level/levels/level_7.tscn" id="20_lvl7"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/fx/shield_break_vfx.tscn" id="21_shieldfx"]
+[ext_resource type="PackedScene" path="res://nodes/game/world/fx/spark_vfx.tscn" id="22_pickupfx"]
 [ext_resource type="PackedScene" path="res://nodes/ui/wind_clock.tscn" id="19_wclock"]
 
 [node name="Game" unique_id=1288291301 instance=ExtResource("1_uwrxv")]
@@ -279,6 +282,8 @@ script = ExtResource("6_u5sy4")
 world_node = NodePath("../../World")
 camera = NodePath("../../Camera2D")
 spawner_controller = NodePath("../SpawnerController")
+shield_break_vfx_scene = ExtResource("21_shieldfx")
+pickup_vfx_scene = ExtResource("22_pickupfx")
 
 [node name="InputController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="5" unique_id=56638392]
 script = ExtResource("7_u5sy4")
@@ -288,7 +293,7 @@ script = ExtResource("3_gee14")
 
 [node name="LevelController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="7" unique_id=751596711]
 script = ExtResource("9_0tnpc")
-level_scenes = Array[PackedScene]([ExtResource("13_lvl1"), ExtResource("14_lvl2"), ExtResource("15_lvl3"), ExtResource("16_lvl4"), ExtResource("17_lvl5"), ExtResource("18_lvl6")])
+level_scenes = Array[PackedScene]([ExtResource("13_lvl1"), ExtResource("14_lvl2"), ExtResource("15_lvl3"), ExtResource("16_lvl4"), ExtResource("17_lvl5"), ExtResource("18_lvl6"), ExtResource("20_lvl7")])
 
 [node name="SpawnerController" type="Node" parent="Controllers" parent_id_path=PackedInt32Array(1206564580) index="8" unique_id=1214762905 node_paths=PackedStringArray("world_node")]
 script = ExtResource("10_vtaks")

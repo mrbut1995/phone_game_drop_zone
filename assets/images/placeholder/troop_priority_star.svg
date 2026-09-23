@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-16 -16 32 32" width="64" height="64">
+  <!-- PRIORITY CHARACTER STAR (Update_Feature.md 6.1) - ngôi sao vàng đánh dấu nhân vật ưu tiên
+       Vẽ ở 2x: Sprite dùng offset (-32,-32) + scale 0.5 -->
+  <polygon points="0,-13 3.8,-4.2 13,-4.2 5.6,1.6 8.2,10.6 0,5.4 -8.2,10.6 -5.6,1.6 -13,-4.2 -3.8,-4.2"
+           fill="#ffd23f" stroke="#8a5a00" stroke-width="1.4" stroke-linejoin="round" />
+  <circle cx="-2.5" cy="-3.5" r="2" fill="#fff6cc" fill-opacity="0.9" />
+</svg>

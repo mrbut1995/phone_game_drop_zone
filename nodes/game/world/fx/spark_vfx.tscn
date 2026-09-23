@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" uid="uid://dnsqstjbtt2ov" path="res://nodes/game/world/fx/vfx.tscn" id="1_vfx"]
+[ext_resource type="SpriteFrames" uid="uid://b6mfdb7n4h3o3" path="res://resources/animations/spark_frames.tres" id="2_frames"]
+
+
+[node name="PickupVfx" unique_id=873024702 instance=ExtResource("1_vfx")]
+z_index = 20
+hide_when_done = false
+auto_free = true
+randomize_rotation = true
+randomize_scale = true
+scale_range = Vector2(0.7, 1.0)
+sprite_frames = ExtResource("2_frames")
+animation = &"zap"

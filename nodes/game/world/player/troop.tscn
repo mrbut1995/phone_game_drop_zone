@@ -1,9 +1,13 @@
-[gd_scene load_steps=6 format=3 uid="uid://dvxfboso8aymw"]
+[gd_scene load_steps=10 format=3 uid="uid://dvxfboso8aymw"]
 
 [ext_resource type="PackedScene" uid="uid://b18gcgc0mishy" path="res://nodes/game/world/world_actor.tscn" id="1_me1h0"]
 [ext_resource type="Script" uid="uid://mx34j6w7ubty" path="res://scripts/nodes/game/world/troop.gd" id="2_4pukw"]
 [ext_resource type="SpriteFrames" path="res://resources/animations/troop_frames.tres" id="3_troopf"]
 [ext_resource type="Texture2D" uid="uid://bf2lii6w48rmx" path="res://assets/images/placeholder/parachute.svg" id="4_chute"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/troop_lead_marker.svg" id="5_lead"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/troop_shield_aura.svg" id="6_aura"]
+[ext_resource type="Texture2D" path="res://assets/images/placeholder/troop_priority_star.svg" id="7_star"]
+[ext_resource type="SpriteFrames" path="res://resources/animations/hit_burst_frames.tres" id="8_hitfx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_troop"]
 radius = 5.0
@@ -49,3 +53,32 @@ position = Vector2(0, -6)
 width = 3.0
 default_color = Color(1, 0.85, 0.2, 0.9)
 antialiased = true
+
+[node name="ShieldAura" type="Sprite2D" parent="." index="5"]
+visible = false
+texture = ExtResource("6_aura")
+centered = false
+offset = Vector2(-60, -80)
+scale = Vector2(0.5, 0.5)
+
+[node name="LeadMarker" type="Sprite2D" parent="." index="6"]
+visible = false
+texture = ExtResource("5_lead")
+centered = false
+offset = Vector2(-60, -160)
+scale = Vector2(0.5, 0.5)
+
+[node name="PriorityStar" type="Sprite2D" parent="." index="7"]
+visible = false
+position = Vector2(26, -26)
+texture = ExtResource("7_star")
+centered = false
+offset = Vector2(-32, -32)
+scale = Vector2(0.5, 0.5)
+
+[node name="Vfx" parent="." index="8"]
+z_index = 20
+randomize_rotation = true
+randomize_scale = true
+sprite_frames = ExtResource("8_hitfx")
+animation = &"burst"
